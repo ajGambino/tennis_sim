@@ -2,6 +2,10 @@
 test elo system and compare results with/without elo adjustments
 """
 
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).parent))
+
 from simulation.data_loader import load_match_data
 from simulation.player_stats import PlayerStatsCalculator
 from simulation.elo_system import EloSystem

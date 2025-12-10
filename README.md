@@ -1,16 +1,27 @@
 # Tennis Match Simulation Framework
 
-A comprehensive point-level Monte Carlo tennis simulation engine built with Python, using Jeff Sackmann's public tennis datasets.
+A comprehensive point-level and shot-by-shot Monte Carlo tennis simulation engine built with Python, using Jeff Sackmann's public tennis datasets.
 
 ## Features
 
 - **Point-level simulation**: Every point simulated using probabilistic serve/return models
+- **Shot-level simulation (NEW)**: Shot-by-shot rally simulation with serve placement, return quality, and tactical modeling
 - **Historical data integration**: Uses real ATP/WTA match statistics from Jeff Sackmann's datasets
+- **Match Charting Project support**: Player-specific shot patterns from 17,000+ charted matches
 - **Full tennis rules**: Advantage scoring, tiebreaks, set/match logic
 - **Monte Carlo analysis**: Run thousands of simulations to compute win probabilities and distributions
-- **Comprehensive statistics**: Aces, double faults, break points, first serve %, and more
+- **Comprehensive statistics**: Aces, double faults, break points, first serve %, rally lengths, and more
 - **Surface-specific stats**: Aggregate player performance by court surface (hard, clay, grass)
+- **Elo rating system**: Skill-based adjustments for realistic match outcomes
+- **ML-powered predictions**: XGBoost model for match outcome prediction
 - **Reproducible results**: All simulations use random seeds for exact reproducibility
+
+## Phase Evolution
+
+- **Phase 0:** Basic point-level simulation with static player stats
+- **Phase 1:** Elo rating system integration for skill differentiation ([PHASE_1_ELO.md](PHASE_1_ELO.md))
+- **Phase 2:** ML-powered parameter estimation with XGBoost ([PHASE_2_READY.md](PHASE_2_READY.md))
+- **Phase 3A:** Shot-by-shot simulation with Match Charting Project integration ([PHASE_3A_SHOT_LEVEL.md](PHASE_3A_SHOT_LEVEL.md)) ← **YOU ARE HERE**
 
 ## Installation
 

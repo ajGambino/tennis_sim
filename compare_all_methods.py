@@ -1,24 +1,28 @@
 """
-comparison script: baseline vs elo-adjusted simulations
+compare all prediction methods: baseline vs elo vs ml
 
-demonstrates the improvement from elo rating adjustments
+demonstrates improvement from baseline → elo → ml
 """
 
+import os
 import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
+
+from datetime import datetime
 
 from simulation.data_loader import load_match_data
 from simulation.player_stats import PlayerStatsCalculator
 from simulation.elo_system import EloSystem
 from simulation.ranking_adjuster import EloAdjuster
 from simulation.simulator import run_simulations, analyze_results
+from simulation.ml_predictor import MLMatchPredictor
 
 
-def compare_simulations(player_a: str, player_b: str, surface: str = 'hard',
-                        n_sims: int = 1000, tour: str = 'atp'):
+def compare_all_methods(player_a: str, player_b: str, surface: str = 'hard',
+                       n_sims: int = 1000, tour: str = 'atp'):
     """
-    run simulations with and without elo adjustments
+    compare all three prediction methods
 
     args:
         player_a: first player name
@@ -28,7 +32,7 @@ def compare_simulations(player_a: str, player_b: str, surface: str = 'hard',
         tour: 'atp' or 'wta'
     """
     print(f"\n{'='*80}")
-    print(f"BASELINE VS ELO COMPARISON")
+    print(f"COMPREHENSIVE COMPARISON: BASELINE vs ELO vs ML")
     print(f"{player_a} vs {player_b} ({surface} court)")
     print(f"{'='*80}\n")
 
@@ -48,8 +52,7 @@ def compare_simulations(player_a: str, player_b: str, surface: str = 'hard',
           f"{stats_b.first_serve_win_pct:.1%} 1st serve win")
 
     # build elo
-    print("\nbuilding elo ratings...")
-    import os
+    print("\nloading elo ratings...")
     elo_file = f"models/elo_ratings_{tour}.json"
 
     if os.path.exists(elo_file):
@@ -70,16 +73,32 @@ def compare_simulations(player_a: str, player_b: str, surface: str = 'hard',
     print(f"  {player_a}: {elo_a:.0f}")
     print(f"  {player_b}: {elo_b:.0f}")
     print(f"  differential: {elo_diff:+.0f}")
-    print(f"  expected win prob: {win_prob_elo:.1%} - {1-win_prob_elo:.1%}")
+    print(f"  elo win prob: {win_prob_elo:.1%} - {1-win_prob_elo:.1%}")
 
-    # adjust stats
+    # ml prediction
+    ml_model_path = f'models/match_predictor_xgb.pkl'
+    ml_available = os.path.exists(ml_model_path)
+
+    if ml_available:
+        print("\nloading ml model...")
+        predictor = MLMatchPredictor(ml_model_path)
+        ml_pred = predictor.predict_match(stats_a, stats_b, elo_a, elo_b, surface)
+        ml_win_prob = ml_pred['player_a_win_prob']
+        print(f"  ml win prob: {ml_win_prob:.1%} - {1-ml_win_prob:.1%}")
+        print(f"  ml confidence: {ml_pred['confidence']:.1%}")
+    else:
+        print("\nml model not found - skipping ml predictions")
+        print(f"  run 'python training/train_point_model.py' to train model")
+        ml_win_prob = None
+
+    # adjust stats with elo
     elo_adjuster = EloAdjuster(max_adjustment=0.15)
     stats_a_elo = elo_adjuster.adjust_stats(stats_a, elo_a, elo_b)
     stats_b_elo = elo_adjuster.adjust_stats(stats_b, elo_b, elo_a)
 
     # run baseline simulations
     print(f"\n{'-'*80}")
-    print("BASELINE SIMULATION (No Elo)")
+    print(f"METHOD 1: BASELINE (No Adjustments)")
     print(f"{'-'*80}")
     results_baseline = run_simulations(stats_a, stats_b, n=n_sims,
                                        best_of=3, start_seed=42)
@@ -87,7 +106,7 @@ def compare_simulations(player_a: str, player_b: str, surface: str = 'hard',
 
     # run elo simulations
     print(f"\n{'-'*80}")
-    print("ELO-ADJUSTED SIMULATION")
+    print(f"METHOD 2: ELO-ADJUSTED SIMULATION")
     print(f"{'-'*80}")
     results_elo = run_simulations(stats_a_elo, stats_b_elo, n=n_sims,
                                   best_of=3, start_seed=42)
@@ -98,48 +117,65 @@ def compare_simulations(player_a: str, player_b: str, surface: str = 'hard',
     print(f"RESULTS COMPARISON ({n_sims} simulations)")
     print(f"{'='*80}\n")
 
-    print(f"{'Metric':<30} {'Baseline':>15} {'Elo-Adjusted':>15} {'Difference':>15}")
+    # create comparison table
+    print(f"{'Method':<25} {player_a + ' Win %':>20} {player_b + ' Win %':>20} {'vs Baseline':>12}")
     print(f"{'-'*80}")
 
-    baseline_a_win = summary_baseline['a_win_pct']
-    elo_a_win = summary_elo['a_win_pct']
-    diff = elo_a_win - baseline_a_win
+    baseline_a = summary_baseline['a_win_pct']
+    elo_a_sim = summary_elo['a_win_pct']
 
-    print(f"{player_a + ' Win %':<30} {baseline_a_win:>14.1%} {elo_a_win:>14.1%} {diff:>+14.1%}")
-    print(f"{player_b + ' Win %':<30} {summary_baseline['b_win_pct']:>14.1%} "
-          f"{summary_elo['b_win_pct']:>14.1%} {-diff:>+14.1%}")
+    print(f"{'1. Baseline':<25} {baseline_a:>19.1%} {summary_baseline['b_win_pct']:>19.1%} {'--':>12}")
+    print(f"{'2. Elo (Simulation)':<25} {elo_a_sim:>19.1%} {summary_elo['b_win_pct']:>19.1%} {elo_a_sim - baseline_a:>+11.1%}")
+    print(f"{'3. Elo (Formula)':<25} {win_prob_elo:>19.1%} {1-win_prob_elo:>19.1%} {win_prob_elo - baseline_a:>+11.1%}")
 
-    print(f"\n{'Expected (Elo Formula)':<30} {'':>15} {win_prob_elo:>14.1%} {'':>15}")
+    if ml_available:
+        print(f"{'4. ML Model':<25} {ml_win_prob:>19.1%} {1-ml_win_prob:>19.1%} {ml_win_prob - baseline_a:>+11.1%}")
 
     print(f"\n{'-'*80}")
-    print("Average Match Stats:")
+    print("Improvements Summary:")
+    print(f"{'-'*80}")
+    print(f"Baseline → Elo Simulation:  {elo_a_sim - baseline_a:+.1%}")
+    print(f"Baseline → Elo Formula:     {win_prob_elo - baseline_a:+.1%}")
+    if ml_available:
+        print(f"Baseline → ML Model:        {ml_win_prob - baseline_a:+.1%}")
+        print(f"Elo Formula → ML Model:     {ml_win_prob - win_prob_elo:+.1%}")
+
+    print(f"\n{'-'*80}")
+    print("Average Match Stats (from simulations):")
+    print(f"{'-'*80}")
+
+    print(f"\n{'Statistic':<30} {'Baseline':>15} {'Elo-Adjusted':>15} {'Difference':>12}")
     print(f"{'-'*80}")
 
     print(f"{'Aces ' + player_a:<30} {summary_baseline['mean_aces_a']:>14.1f} "
           f"{summary_elo['mean_aces_a']:>14.1f} "
-          f"{summary_elo['mean_aces_a'] - summary_baseline['mean_aces_a']:>+14.1f}")
+          f"{summary_elo['mean_aces_a'] - summary_baseline['mean_aces_a']:>+11.1f}")
 
     print(f"{'Double Faults ' + player_a:<30} {summary_baseline['mean_df_a']:>14.1f} "
           f"{summary_elo['mean_df_a']:>14.1f} "
-          f"{summary_elo['mean_df_a'] - summary_baseline['mean_df_a']:>+14.1f}")
+          f"{summary_elo['mean_df_a'] - summary_baseline['mean_df_a']:>+11.1f}")
 
     print(f"{'Total Points ' + player_a:<30} {summary_baseline['mean_total_points_a']:>14.1f} "
           f"{summary_elo['mean_total_points_a']:>14.1f} "
-          f"{summary_elo['mean_total_points_a'] - summary_baseline['mean_total_points_a']:>+14.1f}")
+          f"{summary_elo['mean_total_points_a'] - summary_baseline['mean_total_points_a']:>+11.1f}")
 
     print(f"{'='*80}\n")
 
+    # return summary
     return {
-        'baseline': summary_baseline,
-        'elo': summary_elo,
-        'improvement': diff
+        'baseline_win_pct': baseline_a,
+        'elo_sim_win_pct': elo_a_sim,
+        'elo_formula_win_pct': win_prob_elo,
+        'ml_win_pct': ml_win_prob if ml_available else None,
+        'baseline_to_elo_improvement': elo_a_sim - baseline_a,
+        'baseline_to_ml_improvement': (ml_win_prob - baseline_a) if ml_available else None
     }
 
 
 if __name__ == '__main__':
     import argparse
 
-    parser = argparse.ArgumentParser(description='compare baseline vs elo simulations')
+    parser = argparse.ArgumentParser(description='compare all prediction methods')
     parser.add_argument('--playerA', type=str, default='Jannik Sinner',
                        help='first player name')
     parser.add_argument('--playerB', type=str, default='Gabriel Diallo',
@@ -155,7 +191,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    compare_simulations(
+    compare_all_methods(
         args.playerA,
         args.playerB,
         args.surface,

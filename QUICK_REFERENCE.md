@@ -65,23 +65,24 @@ python compare_elo.py --playerA "Novak Djokovic" --playerB "Carlos Alcaraz" --n 
 
 ## Flags Explained
 
-| Flag | Description | Example |
-|------|-------------|---------|
-| `--playerA` | First player name | `"Jannik Sinner"` |
-| `--playerB` | Second player name | `"Carlos Alcaraz"` |
-| `--use_elo` | Enable Elo adjustments (RECOMMENDED) | Just add flag |
-| `--surface` | Court surface | `hard`, `clay`, `grass` |
-| `--best_of` | Match format | `3` (default) or `5` |
-| `--n` | Number of simulations (bulk only) | `1000`, `5000`, `10000` |
-| `--seed` | Random seed for reproducibility | `12345` |
-| `--tour` | Tour type | `atp` (default) or `wta` |
-| `--output` | Custom output filename (bulk) | `my_results.csv` |
-| `--no_save` | Don't save CSV (bulk) | Just add flag |
-| `--elo_file` | Custom Elo ratings file | `models/my_elo.json` |
+| Flag         | Description                          | Example                  |
+| ------------ | ------------------------------------ | ------------------------ |
+| `--playerA`  | First player name                    | `"Jannik Sinner"`        |
+| `--playerB`  | Second player name                   | `"Carlos Alcaraz"`       |
+| `--use_elo`  | Enable Elo adjustments (RECOMMENDED) | Just add flag            |
+| `--surface`  | Court surface                        | `hard`, `clay`, `grass`  |
+| `--best_of`  | Match format                         | `3` (default) or `5`     |
+| `--n`        | Number of simulations (bulk only)    | `1000`, `5000`, `10000`  |
+| `--seed`     | Random seed for reproducibility      | `12345`                  |
+| `--tour`     | Tour type                            | `atp` (default) or `wta` |
+| `--output`   | Custom output filename (bulk)        | `my_results.csv`         |
+| `--no_save`  | Don't save CSV (bulk)                | Just add flag            |
+| `--elo_file` | Custom Elo ratings file              | `models/my_elo.json`     |
 
 ## When to Use Elo
 
 **Always use `--use_elo` unless:**
+
 - You're specifically testing baseline performance
 - You're comparing baseline vs Elo results
 
@@ -90,10 +91,12 @@ python compare_elo.py --playerA "Novak Djokovic" --playerB "Carlos Alcaraz" --n 
 ## Output Files
 
 ### Single Match
+
 - Prints full match statistics to console
 - No file saved
 
 ### Bulk Simulation
+
 - Saves CSV to `results/` directory
 - Filename format: `PlayerA_vs_PlayerB_surface_elo_Nsims_timestamp.csv`
 - Example: `Jannik_Sinner_vs_Carlos_Alcaraz_hard_elo_5000sims_20241209_193000.csv`
@@ -108,21 +111,25 @@ python compare_elo.py --playerA "Novak Djokovic" --playerB "Carlos Alcaraz" --n 
 ## Example Workflows
 
 ### Quick Single Match
+
 ```bash
 python run_single.py --playerA "Jannik Sinner" --playerB "Carlos Alcaraz" --use_elo
 ```
 
 ### Tournament Final Simulation
+
 ```bash
 python run_bulk.py --playerA "Jannik Sinner" --playerB "Carlos Alcaraz" --use_elo --surface hard --best_of 5 --n 10000
 ```
 
 ### Clay Court Specialist Analysis
+
 ```bash
 python run_bulk.py --playerA "Rafael Nadal" --playerB "Novak Djokovic" --use_elo --surface clay --n 5000
 ```
 
 ### Head-to-Head Comparison
+
 ```bash
 # First run baseline
 python run_bulk.py --playerA "Player A" --playerB "Player B" --n 2000 --output baseline.csv
@@ -137,18 +144,22 @@ python compare_elo.py --playerA "Player A" --playerB "Player B" --n 2000
 ## Troubleshooting
 
 ### Player Not Found
+
 - Check spelling (case-sensitive)
 - Player must exist in historical data (2015-2024)
 - Try without surface filter first
 
 ### Low Matches Warning
+
 ```
 warning: Player X has only 5 matches on clay, using fallback stats
 ```
+
 - Normal for players with limited data on specific surface
 - Elo still helps, but predictions less reliable
 
 ### Build Elo Taking Long
+
 - First run builds from 26k+ matches (~3 seconds)
 - Subsequent runs use cache (instant)
 - Delete `models/elo_ratings_*.json` to rebuild
@@ -163,24 +174,75 @@ warning: Player X has only 5 matches on clay, using fallback stats
 
 ## Performance
 
-| Operation | Time |
-|-----------|------|
-| Build Elo (26k matches) | ~3 seconds |
-| Load cached Elo | <0.1 seconds |
+| Operation               | Time         |
+| ----------------------- | ------------ |
+| Build Elo (26k matches) | ~3 seconds   |
+| Load cached Elo         | <0.1 seconds |
 | Single match simulation | <0.1 seconds |
-| 1000 simulations | ~3 seconds |
-| 5000 simulations | ~15 seconds |
-| 10000 simulations | ~30 seconds |
+| 1000 simulations        | ~3 seconds   |
+| 5000 simulations        | ~15 seconds  |
+| 10000 simulations       | ~30 seconds  |
 
-## What's Next?
+## Shot-Level Simulation (Phase 3A)
 
-**Phase 2** (in development):
-- XGBoost ML models for point prediction
-- Feature engineering from match history
-- Fatigue modeling
-- Point-by-point data integration
-- Further performance optimization
+### Compare Point-Level vs Shot-Level
+
+```bash
+# Compare both simulation modes
+python compare_shot_vs_point.py --playerA "Jannik Sinner" --playerB "Carlos Alcaraz" --n 100
+
+# On specific surface
+python compare_shot_vs_point.py --playerA "Rafael Nadal" --playerB "Novak Djokovic" --surface clay --n 500
+```
+
+### Train Shot Models (Optional)
+
+```bash
+# Download Match Charting Project data (one-time setup)
+download_charting_data.bat  # Windows
+./download_charting_data.sh  # Mac/Linux
+
+# Train serve placement model
+python training/train_serve_model.py --tour atp
+
+# Train rally model
+python training/train_rally_model.py --tour atp
+```
+
+### Validate Shot Simulation
+
+```bash
+# Validate serve placements
+python analysis/validate_shot_simulation.py --validate serve --player "Novak Djokovic"
+
+# Validate rally lengths
+python analysis/validate_shot_simulation.py --validate rally --num_sims 500
+
+# Run all validations
+python analysis/validate_shot_simulation.py --validate all
+```
+
+### Shot-Level Features
+
+- **Serve placement:** Wide / T / Body zones
+- **Return quality:** Winner / Deep / Short / Error
+- **Rally simulation:** Shot-by-shot exchanges
+- **Court positioning:** Baseline / Net / Inside baseline
+- **Tactical modeling:** Approach shots, shot selection
+- **Rally statistics:** Length, point-ending shots, shot types
+
+**See:** [QUICK_START_SHOT_LEVEL.md](QUICK_START_SHOT_LEVEL.md) and [PHASE_3A_SHOT_LEVEL.md](PHASE_3A_SHOT_LEVEL.md)
+
+## Phase Evolution
+
+- ✅ **Phase 0:** Basic point-level simulation
+- ✅ **Phase 1:** Elo rating system integration
+- ✅ **Phase 2:** ML-powered predictions with XGBoost
+- ✅ **Phase 3A:** Shot-by-shot simulation with Match Charting Project ← **YOU ARE HERE**
+- 🚧 **Phase 3B:** Advanced tactics, momentum, fatigue (coming soon)
 
 ---
 
-**Quick start:** `python run_bulk.py --playerA "Jannik Sinner" --playerB "Carlos Alcaraz" --use_elo --n 5000`
+**Quick start (point-level):** `python run_bulk.py --playerA "Jannik Sinner" --playerB "Carlos Alcaraz" --use_elo --n 5000`
+
+**Quick start (shot-level):** `python compare_shot_vs_point.py --playerA "Jannik Sinner" --playerB "Carlos Alcaraz" --n 100`

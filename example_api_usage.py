@@ -4,6 +4,10 @@ example programmatic api usage
 demonstrates how to use the simulation framework in your own python code
 """
 
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).parent))
+
 from simulation.data_loader import load_match_data
 from simulation.player_stats import PlayerStatsCalculator, PlayerStats
 from simulation.match_engine import MatchSimulator

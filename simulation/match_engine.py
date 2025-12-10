@@ -5,7 +5,7 @@ implements tennis game, set, and match logic with full rules including tiebreaks
 """
 
 import numpy as np
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Optional
 from dataclasses import dataclass, field
 from simulation.player_stats import PlayerStats
 from simulation.point_engine import PointSimulator, PointResult
@@ -122,7 +122,8 @@ class MatchSimulator:
     SCORE_NAMES = ['0', '15', '30', '40', 'AD']
 
     def __init__(self, player_a_stats: PlayerStats, player_b_stats: PlayerStats,
-                 best_of: int = 3, seed: int = None):
+                 best_of: int = 3, seed: int = None,
+                 point_simulator: Optional[PointSimulator] = None):
         """
         initialize match simulator
 
@@ -131,6 +132,8 @@ class MatchSimulator:
             player_b_stats: statistics for player b
             best_of: 3 or 5 sets
             seed: random seed for reproducibility
+            point_simulator: optional custom point simulator (for shot-level simulation)
+                           if none, creates default point-level simulator
         """
         self.player_a_stats = player_a_stats
         self.player_b_stats = player_b_stats
@@ -143,8 +146,11 @@ class MatchSimulator:
         self.seed = seed
         self.rng = np.random.default_rng(seed)
 
-        # initialize point simulator
-        self.point_sim = PointSimulator(self.rng)
+        # initialize point simulator (use custom if provided, otherwise create default)
+        if point_simulator is not None:
+            self.point_sim = point_simulator
+        else:
+            self.point_sim = PointSimulator(self.rng)
 
         # match tracking
         self.match_stats = None

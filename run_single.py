@@ -7,6 +7,9 @@ command-line interface for simulating a single tennis match
 import argparse
 import sys
 import os
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).parent))
+
 from simulation.data_loader import DataLoader
 from simulation.player_stats import PlayerStatsCalculator
 from simulation.match_engine import MatchSimulator
