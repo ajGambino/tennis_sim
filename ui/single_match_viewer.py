@@ -28,12 +28,37 @@ from simulation.return_model import ReturnModel
 
 @st.cache_data
 def load_player_list():
-    """Load list of available players from match data"""
+    """Load list of available players from match data, sorted by Elo rating"""
     try:
+        import json
+
+        # Load Elo ratings
+        elo_file = 'models/elo_ratings_atp.json'
+        if os.path.exists(elo_file):
+            with open(elo_file, 'r') as f:
+                elo_data = json.load(f)
+                ratings = elo_data.get('ratings', {})
+
+                # Calculate average Elo for each player across surfaces
+                player_avg_elos = {}
+                for player, surfaces in ratings.items():
+                    if isinstance(surfaces, dict):
+                        avg_elo = np.mean(list(surfaces.values()))
+                    else:
+                        avg_elo = surfaces
+                    player_avg_elos[player] = avg_elo
+
+                # Sort players by Elo (highest to lowest)
+                sorted_players = sorted(player_avg_elos.keys(),
+                                       key=lambda p: player_avg_elos[p],
+                                       reverse=True)
+                return sorted_players
+
+        # Fallback to loading from match data if Elo file doesn't exist
         loader = DataLoader(data_dir='data')
         matches = loader.load_match_data(years=[2020, 2021, 2022, 2023], tour='atp')
         if matches is None or len(matches) == 0:
-            return ["Novak Djokovic", "Carlos Alcaraz", "Jannik Sinner", "Daniil Medvedev"]
+            return ["Carlos Alcaraz", "Jannik Sinner", "Novak Djokovic", "Daniil Medvedev"]
 
         winners = set(matches['winner_name'].unique())
         losers = set(matches['loser_name'].unique())
@@ -41,7 +66,7 @@ def load_player_list():
         return all_players
     except Exception as e:
         st.error(f"Error loading players: {e}")
-        return ["Novak Djokovic", "Carlos Alcaraz"]
+        return ["Carlos Alcaraz", "Jannik Sinner"]
 
 
 @st.cache_data
@@ -293,10 +318,49 @@ def display_play_by_play(match_result, player_a, player_b, use_shot_sim):
 
         filtered_points.append((idx + 1, point, point_server))
 
-    st.write(f"**Showing:** {len(filtered_points)} of {len(point_history)} points")
+    total_points = len(filtered_points)
+    st.write(f"**Showing:** {total_points} of {len(point_history)} points")
 
-    # Display points
-    for point_num, point, server in filtered_points:
+    # Pagination controls
+    points_per_page = 20
+    total_pages = max(1, (total_points + points_per_page - 1) // points_per_page)
+
+    # Initialize page number in session state
+    if 'pbp_page' not in st.session_state:
+        st.session_state.pbp_page = 1
+
+    # Reset to page 1 if filters changed (check by storing filter signature)
+    filter_signature = f"{filter_rally_length}|{filter_server}|{show_shot_details}"
+    if 'pbp_filter_sig' not in st.session_state or st.session_state.pbp_filter_sig != filter_signature:
+        st.session_state.pbp_page = 1
+        st.session_state.pbp_filter_sig = filter_signature
+
+    # Ensure page number is within valid range
+    if st.session_state.pbp_page > total_pages:
+        st.session_state.pbp_page = total_pages
+
+    # Pagination controls
+    col1, col2, col3 = st.columns([1, 2, 1])
+
+    with col1:
+        if st.button("◀ Previous", disabled=st.session_state.pbp_page <= 1, key="pbp_prev"):
+            st.session_state.pbp_page -= 1
+
+    with col2:
+        st.markdown(f"<div style='text-align: center;'>**Page {st.session_state.pbp_page} of {total_pages}**</div>", unsafe_allow_html=True)
+
+    with col3:
+        if st.button("Next ▶", disabled=st.session_state.pbp_page >= total_pages, key="pbp_next"):
+            st.session_state.pbp_page += 1
+
+    st.markdown("---")
+
+    # Calculate slice indices for current page
+    start_idx = (st.session_state.pbp_page - 1) * points_per_page
+    end_idx = min(start_idx + points_per_page, total_points)
+
+    # Display points for current page
+    for point_num, point, server in filtered_points[start_idx:end_idx]:
         with st.container():
             # Point header
             col1, col2, col3, col4 = st.columns([1, 2, 2, 2])
@@ -400,11 +464,11 @@ def render():
     col1, col2 = st.columns(2)
 
     with col1:
-        default_a = players.index("Novak Djokovic") if "Novak Djokovic" in players else 0
+        default_a = players.index("Carlos Alcaraz") if "Carlos Alcaraz" in players else 0
         player_a = st.selectbox("Player A", players, index=default_a, key="sm_player_a")
 
     with col2:
-        default_b = players.index("Carlos Alcaraz") if "Carlos Alcaraz" in players else 1
+        default_b = players.index("Jannik Sinner") if "Jannik Sinner" in players else 1
         player_b = st.selectbox("Player B", players, index=default_b, key="sm_player_b")
 
     # Match parameters
@@ -434,7 +498,27 @@ def render():
         with st.spinner("Simulating match..."):
             match_result = simulate_single_match(player_a, player_b, surface, best_of, use_shot_sim, seed)
 
+        # Store match result and parameters in session state
+        st.session_state.match_result = match_result
+        st.session_state.match_player_a = player_a
+        st.session_state.match_player_b = player_b
+        st.session_state.match_surface = surface
+        st.session_state.match_best_of = best_of
+        st.session_state.match_use_shot_sim = use_shot_sim
+        st.session_state.match_seed = seed
+        st.session_state.pbp_page = 1  # Reset pagination to first page
+
         st.success("✅ Match simulation complete!")
+
+    # Display match results if available in session state
+    if 'match_result' in st.session_state:
+        match_result = st.session_state.match_result
+        player_a = st.session_state.match_player_a
+        player_b = st.session_state.match_player_b
+        surface = st.session_state.match_surface
+        best_of = st.session_state.match_best_of
+        use_shot_sim = st.session_state.match_use_shot_sim
+        seed = st.session_state.match_seed
 
         # Match Result Header
         st.markdown("---")

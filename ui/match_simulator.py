@@ -29,13 +29,37 @@ from simulation.return_model import ReturnModel
 
 @st.cache_data
 def load_player_list():
-    """Load list of available players from match data"""
+    """Load list of available players from match data, sorted by Elo rating"""
     try:
+        import json
+
+        # Load Elo ratings
+        elo_file = 'models/elo_ratings_atp.json'
+        if os.path.exists(elo_file):
+            with open(elo_file, 'r') as f:
+                elo_data = json.load(f)
+                ratings = elo_data.get('ratings', {})
+
+                # Calculate average Elo for each player across surfaces
+                player_avg_elos = {}
+                for player, surfaces in ratings.items():
+                    if isinstance(surfaces, dict):
+                        avg_elo = np.mean(list(surfaces.values()))
+                    else:
+                        avg_elo = surfaces
+                    player_avg_elos[player] = avg_elo
+
+                # Sort players by Elo (highest to lowest)
+                sorted_players = sorted(player_avg_elos.keys(),
+                                       key=lambda p: player_avg_elos[p],
+                                       reverse=True)
+                return sorted_players
+
+        # Fallback to loading from match data if Elo file doesn't exist
         loader = DataLoader(data_dir='data')
         matches = loader.load_match_data(years=[2020, 2021, 2022, 2023], tour='atp')
         if matches is None or len(matches) == 0:
-            # Return some default players if no data
-            return ["Novak Djokovic", "Carlos Alcaraz", "Jannik Sinner", "Daniil Medvedev"]
+            return ["Carlos Alcaraz", "Jannik Sinner", "Novak Djokovic", "Daniil Medvedev"]
 
         # Get unique player names
         winners = set(matches['winner_name'].unique())
@@ -44,7 +68,7 @@ def load_player_list():
         return all_players
     except Exception as e:
         st.error(f"Error loading players: {e}")
-        return ["Novak Djokovic", "Carlos Alcaraz"]
+        return ["Carlos Alcaraz", "Jannik Sinner"]
 
 
 @st.cache_data
@@ -187,11 +211,11 @@ def render():
     col1, col2 = st.columns(2)
 
     with col1:
-        default_a = players.index("Novak Djokovic") if "Novak Djokovic" in players else 0
+        default_a = players.index("Carlos Alcaraz") if "Carlos Alcaraz" in players else 0
         player_a = st.selectbox("Player A", players, index=default_a, key="player_a")
 
     with col2:
-        default_b = players.index("Carlos Alcaraz") if "Carlos Alcaraz" in players else 1
+        default_b = players.index("Jannik Sinner") if "Jannik Sinner" in players else 1
         player_b = st.selectbox("Player B", players, index=default_b, key="player_b")
 
     # Surface and format
@@ -276,11 +300,61 @@ def render():
                 st.write(f"**{player_a}**")
                 st.write(f"- Avg Aces: {df['aces_a'].mean():.1f}")
                 st.write(f"- Avg Double Faults: {df['dfs_a'].mean():.1f}")
+              
 
             with col2:
                 st.write(f"**{player_b}**")
                 st.write(f"- Avg Aces: {df['aces_b'].mean():.1f}")
                 st.write(f"- Avg Double Faults: {df['dfs_b'].mean():.1f}")
+               
+
+            # Match length statistics
+            st.markdown("#### Match Statistics")
+            col1, col2, col3 = st.columns(3)
+
+            with col1:
+                st.metric("Avg Points Per Match", f"{df['total_points'].mean():.1f}")
+                st.metric("Min Points", f"{df['total_points'].min()}")
+                st.metric("Max Points", f"{df['total_points'].max()}")
+
+            with col2:
+                st.metric("Median Points", f"{df['total_points'].median():.1f}")
+                st.metric("Std Dev Points", f"{df['total_points'].std():.1f}")
+
+            with col3:
+                st.metric("Total Points Played", f"{df['total_points'].sum()}")
+                st.metric("Avg Aces Per Match", f"{(df['aces_a'].mean() + df['aces_b'].mean()):.1f}")
+
+            # Most common scores
+            st.markdown("#### Most Common Match Scores")
+            score_counts = df['score'].value_counts().head(10)
+
+            col1, col2 = st.columns([2, 1])
+
+            with col1:
+                # Create bar chart of most common scores
+                fig_scores = go.Figure(data=[
+                    go.Bar(
+                        x=score_counts.index,
+                        y=score_counts.values,
+                        marker_color='#636EFA',
+                        text=score_counts.values,
+                        textposition='auto'
+                    )
+                ])
+                fig_scores.update_layout(
+                    title="Top 10 Most Common Scores",
+                    xaxis_title="Score",
+                    yaxis_title="Frequency",
+                    height=300
+                )
+                st.plotly_chart(fig_scores, width='stretch')
+
+            with col2:
+                st.write("**Score Frequency:**")
+                for score, count in score_counts.items():
+                    pct = (count / len(df)) * 100
+                    st.write(f"- {score}: {count} ({pct:.1f}%)")
 
         # Export option
         st.markdown("### Export Results")

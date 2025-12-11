@@ -14,14 +14,18 @@ A comprehensive point-level and shot-by-shot Monte Carlo tennis simulation engin
 - **Surface-specific stats**: Aggregate player performance by court surface (hard, clay, grass)
 - **Elo rating system**: Skill-based adjustments for realistic match outcomes
 - **ML-powered predictions**: XGBoost model for match outcome prediction
+- **Interactive Streamlit UI**: Modern web interface with real-time simulation and visualization
+- **Elo-sorted player selection**: Players ranked by strength in dropdown menus
+- **Paginated shot replay**: Browse shot-by-shot details with 20 shots per page
 - **Reproducible results**: All simulations use random seeds for exact reproducibility
 
 ## Phase Evolution
 
 - **Phase 0:** Basic point-level simulation with static player stats
-- **Phase 1:** Elo rating system integration for skill differentiation ([PHASE_1_ELO.md](PHASE_1_ELO.md))
-- **Phase 2:** ML-powered parameter estimation with XGBoost ([PHASE_2_READY.md](PHASE_2_READY.md))
-- **Phase 3A:** Shot-by-shot simulation with Match Charting Project integration ([PHASE_3A_SHOT_LEVEL.md](PHASE_3A_SHOT_LEVEL.md)) ← **YOU ARE HERE**
+- **Phase 1:** Elo rating system integration for skill differentiation ([PHASE_1_COMPLETE.md](xReferences/PHASE_1_COMPLETE.md))
+- **Phase 2:** ML-powered parameter estimation with XGBoost ([PHASE_2_READY.md](xReferences/PHASE_2_READY.md))
+- **Phase 3A:** Shot-by-shot simulation with Match Charting Project integration ([PHASE_3A_COMPLETE.md](xReferences/PHASE_3A_COMPLETE.md))
+- **Phase 3B:** Interactive Streamlit UI with Elo-sorted players and advanced visualizations ← **YOU ARE HERE**
 
 ## Installation
 
@@ -43,6 +47,10 @@ Requirements:
 - Python 3.8+
 - pandas >= 2.0.0
 - numpy >= 1.24.0
+- streamlit >= 1.28.0 (for web UI)
+- plotly >= 5.18.0 (for visualizations)
+- xgboost >= 2.0.0 (for ML predictions)
+- scikit-learn >= 1.4.0 (for ML features)
 
 ### 3. Download tennis data (optional)
 
@@ -66,12 +74,45 @@ The framework will automatically load any CSV files matching the pattern `atp_ma
 
 ## Quick Start
 
-### Single Match Simulation
+### Streamlit Web UI (Recommended)
+
+The easiest way to use the simulator is through the interactive Streamlit interface:
+
+```bash
+streamlit run app.py
+```
+
+This launches a web application at `http://localhost:8501` with two main pages:
+
+**Page 1: Match Simulator**
+- Run bulk Monte Carlo simulations (10-1000 matches)
+- Select players from Elo-ranked dropdowns (strongest to weakest)
+- Choose surface (hard, clay, grass) and format (best of 3 or 5)
+- Enable shot-level simulation for detailed rally analysis
+- View win probability distributions and match statistics
+- See most common scores with frequency charts
+- Export results to CSV
+
+**Page 2: Single Match Viewer**
+- Simulate one detailed match with complete statistics
+- Set-by-set progression charts
+- Performance comparison radar charts
+- Detailed statistics tables
+- **Shot-by-shot replay viewer** with pagination (20 shots per page)
+- Filter points by rally length and server
+- Expand individual rallies to see every shot with type, direction, position, and outcome
+- Reproducible with custom random seeds
+
+### Command Line Interface
+
+For scripted or automated workflows, you can use the CLI tools:
+
+#### Single Match Simulation
 
 Simulate one match and see detailed statistics:
 
 ```bash
-python run_single.py --playerA "Novak Djokovic" --playerB "Carlos Alcaraz"
+python xMonteCarlo/run_single.py --playerA "Novak Djokovic" --playerB "Carlos Alcaraz"
 ```
 
 Output includes:
@@ -86,21 +127,21 @@ Output includes:
 
 ```bash
 # specify surface
-python run_single.py --playerA "Novak Djokovic" --playerB "Carlos Alcaraz" --surface clay
+python xMonteCarlo/run_single.py --playerA "Novak Djokovic" --playerB "Carlos Alcaraz" --surface clay
 
 # best of 5 sets
-python run_single.py --playerA "Novak Djokovic" --playerB "Carlos Alcaraz" --best_of 5
+python xMonteCarlo/run_single.py --playerA "Novak Djokovic" --playerB "Carlos Alcaraz" --best_of 5
 
 # reproducible simulation with seed
-python run_single.py --playerA "Novak Djokovic" --playerB "Carlos Alcaraz" --seed 12345
+python xMonteCarlo/run_single.py --playerA "Novak Djokovic" --playerB "Carlos Alcaraz" --seed 12345
 ```
 
-### Bulk Monte Carlo Simulation
+#### Bulk Monte Carlo Simulation
 
 Run thousands of simulations to compute win probabilities:
 
 ```bash
-python run_bulk.py --playerA "Novak Djokovic" --playerB "Carlos Alcaraz" --n 5000
+python xMonteCarlo/run_bulk.py --playerA "Novak Djokovic" --playerB "Carlos Alcaraz" --n 5000
 ```
 
 Output includes:
@@ -115,36 +156,71 @@ Output includes:
 
 ```bash
 # surface-specific simulation
-python run_bulk.py --playerA "Novak Djokovic" --playerB "Carlos Alcaraz" --n 5000 --surface hard
+python xMonteCarlo/run_bulk.py --playerA "Novak Djokovic" --playerB "Carlos Alcaraz" --n 5000 --surface hard
 
 # best of 5 sets
-python run_bulk.py --playerA "Novak Djokovic" --playerB "Carlos Alcaraz" --n 5000 --best_of 5
+python xMonteCarlo/run_bulk.py --playerA "Novak Djokovic" --playerB "Carlos Alcaraz" --n 5000 --best_of 5
 
 # custom output filename
-python run_bulk.py --playerA "Novak Djokovic" --playerB "Carlos Alcaraz" --n 5000 --output my_results.csv
+python xMonteCarlo/run_bulk.py --playerA "Novak Djokovic" --playerB "Carlos Alcaraz" --n 5000 --output my_results.csv
 
 # don't save csv (just print summary)
-python run_bulk.py --playerA "Novak Djokovic" --playerB "Carlos Alcaraz" --n 1000 --no_save
+python xMonteCarlo/run_bulk.py --playerA "Novak Djokovic" --playerB "Carlos Alcaraz" --n 1000 --no_save
 ```
 
 ## Project Structure
 
 ```
 tennis/
-├── data/                           # place csv files here
-│   └── (atp_matches_YYYY.csv files)
-├── results/                        # simulation output csvs saved here
-├── simulation/                     # core simulation package
-│   ├── __init__.py                # package exports
-│   ├── data_loader.py             # load and preprocess sackmann csvs
-│   ├── player_stats.py            # compute player probability parameters
-│   ├── point_engine.py            # simulate individual points
-│   ├── match_engine.py            # game/set/match logic with full rules
-│   └── simulator.py               # bulk simulation runner
-├── run_single.py                  # cli for single match simulation
-├── run_bulk.py                    # cli for monte carlo simulations
-├── requirements.txt               # python dependencies
-└── README.md                      # this file
+├── app.py                          # Main Streamlit application entry point
+├── ui/                             # Streamlit UI components
+│   ├── match_simulator.py         # Bulk Monte Carlo simulation page
+│   └── single_match_viewer.py     # Single match detailed analysis page
+├── simulation/                     # Core simulation engine
+│   ├── __init__.py                # Package exports
+│   ├── data_loader.py             # Load and preprocess Sackmann CSVs
+│   ├── player_stats.py            # Compute player probability parameters
+│   ├── point_engine.py            # Simulate individual points
+│   ├── match_engine.py            # Game/set/match logic with full rules
+│   ├── simulator.py               # Bulk simulation runner
+│   ├── elo_system.py              # Elo rating system
+│   ├── ml_predictor.py            # XGBoost match prediction
+│   ├── feature_engineering.py     # ML feature extraction
+│   ├── ranking_adjuster.py        # Ranking-based adjustments
+│   ├── charting_loader.py         # Match Charting Project data loader
+│   ├── serve_model.py             # Serve placement and outcome modeling
+│   ├── return_model.py            # Return quality modeling
+│   ├── rally_model.py             # Rally progression and shot selection
+│   └── shot.py                    # Shot data structures and enums
+├── training/                       # ML model training scripts
+│   ├── train_point_model.py       # Train XGBoost point-level model
+│   ├── train_serve_model.py       # Train serve pattern models
+│   └── train_rally_model.py       # Train rally pattern models
+├── data/                           # Tennis match data
+│   ├── (atp_matches_YYYY.csv)     # Jeff Sackmann ATP match files
+│   └── charting/                  # Match Charting Project files (optional)
+├── models/                         # Trained models and patterns
+│   ├── elo_ratings_atp.json       # Pre-computed Elo ratings
+│   ├── serve_patterns.pkl         # Trained serve models
+│   └── rally_patterns.pkl         # Trained rally models
+├── results/                        # Simulation output CSVs
+├── analysis/                       # Analysis notebooks and scripts
+├── xMonteCarlo/                    # CLI tools for Monte Carlo simulation
+│   ├── run_single.py              # Single match CLI
+│   ├── run_bulk.py                # Bulk simulation CLI
+│   └── predict_match.py           # ML prediction CLI
+├── xTesting/                       # Testing and comparison scripts
+│   ├── compare_shot_vs_point.py   # Compare simulation methods
+│   ├── compare_all_methods.py     # Full method comparison
+│   └── test_elo.py                # Elo system tests
+├── xReferences/                    # Documentation and guides
+│   ├── PHASE_1_COMPLETE.md        # Elo integration documentation
+│   ├── PHASE_2_READY.md           # ML prediction documentation
+│   ├── PHASE_3A_COMPLETE.md       # Shot-level simulation documentation
+│   ├── QUICK_REFERENCE.md         # Quick reference guide
+│   └── example_api_usage.py       # API usage examples
+├── requirements.txt                # Python dependencies
+└── README.md                       # This file
 ```
 
 ## How It Works
@@ -338,29 +414,68 @@ Total Points (mean)                 93.2            89.1
 You can also use the framework programmatically in your own Python code:
 
 ```python
-from simulation.data_loader import load_match_data
+from simulation.data_loader import DataLoader
 from simulation.player_stats import PlayerStatsCalculator
 from simulation.match_engine import MatchSimulator
-from simulation.simulator import run_simulations, analyze_results
+from simulation.point_engine import PointSimulator
+from simulation.serve_model import ServeModel
+from simulation.return_model import ReturnModel
+from simulation.rally_model import RallyModel
+import pickle
 
-# load data
-match_data = load_match_data(data_dir='data', tour='atp')
+# Load data
+loader = DataLoader(data_dir='data')
+matches = loader.load_match_data(years=[2020, 2021, 2022, 2023], tour='atp')
 
-# calculate player stats
-stats_calc = PlayerStatsCalculator(match_data)
+# Calculate player stats
+stats_calc = PlayerStatsCalculator(matches)
 djokovic_stats = stats_calc.get_player_stats('Novak Djokovic', surface='hard')
 alcaraz_stats = stats_calc.get_player_stats('Carlos Alcaraz', surface='hard')
 
-# single simulation
-sim = MatchSimulator(djokovic_stats, alcaraz_stats, best_of=3, seed=42)
+# Single point-level simulation
+sim = MatchSimulator(
+    player_a_stats=djokovic_stats,
+    player_b_stats=alcaraz_stats,
+    best_of=3,
+    seed=42
+)
 result = sim.simulate_match()
 print(f"Winner: {result.winner}")
 print(f"Score: {result.score}")
 
-# bulk simulations
-results_df = run_simulations(djokovic_stats, alcaraz_stats, n=10000)
-summary = analyze_results(results_df, 'Novak Djokovic', 'Carlos Alcaraz')
-print(f"Win probability: {summary['a_win_pct']:.2%}")
+# Shot-level simulation with trained models
+with open('models/serve_patterns.pkl', 'rb') as f:
+    serve_data = pickle.load(f)
+with open('models/rally_patterns.pkl', 'rb') as f:
+    rally_data = pickle.load(f)
+
+serve_model = ServeModel(serve_patterns=serve_data.get('serve_patterns', {}))
+return_model = ReturnModel()
+rally_model = RallyModel(rally_patterns=rally_data.get('rally_patterns', {}))
+
+point_sim = PointSimulator(
+    use_shot_simulation=True,
+    serve_model=serve_model,
+    return_model=return_model,
+    rally_model=rally_model
+)
+
+sim_detailed = MatchSimulator(
+    player_a_stats=djokovic_stats,
+    player_b_stats=alcaraz_stats,
+    best_of=3,
+    seed=42,
+    point_simulator=point_sim,
+    track_point_history=True
+)
+result = sim_detailed.simulate_match()
+
+# Access shot-by-shot details
+for point in result.point_history:
+    print(f"Rally length: {point.rally_length}")
+    if point.rally and point.rally.shots:
+        for shot in point.rally.shots:
+            print(f"  Shot {shot.shot_number}: {shot.shot_type} -> {shot.outcome}")
 ```
 
 ### Custom Player Stats
@@ -394,20 +509,29 @@ result = sim.simulate_match()
 **Current Limitations:**
 
 - Does not account for player fatigue over long matches
-- Does not model momentum or streakiness
-- Return stats derived from opponent serve stats (not direct return measurements)
-- No head-to-head adjustment
-- No recent form weighting
+- Does not model momentum or streakiness within a match
+- No head-to-head historical adjustments
+- No recent form or injury weighting
+- Court speed and environmental conditions not yet modeled
 
-**Potential Enhancements:**
+**Recently Added:**
 
-- Incorporate point-by-point charting data for more granular modeling
-- Add player ranking/Elo adjustments
-- Model time-varying probabilities (fatigue, momentum)
-- Add court speed and conditions
-- Support for doubles
-- Head-to-head historical adjustments
-- Injury/form adjustments
+- ✅ Elo rating system for skill differentiation
+- ✅ Shot-by-shot simulation with Match Charting Project data
+- ✅ ML-powered match prediction with XGBoost
+- ✅ Interactive Streamlit UI with visualizations
+- ✅ Surface-specific player statistics
+- ✅ Serve placement and return quality modeling
+
+**Potential Future Enhancements:**
+
+- Model time-varying probabilities (fatigue, momentum shifts)
+- Add court speed ratings (fast/slow hard court)
+- Weather and altitude adjustments
+- Support for doubles matches
+- Head-to-head learning and tactical adjustments
+- Recent form weighting with time decay
+- Player injury status integration
 
 ## Contributing
 
