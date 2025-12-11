@@ -390,7 +390,7 @@ def display_play_by_play(match_result, player_a, player_b, use_shot_sim):
 def render():
     """Render the Single Match Viewer page"""
 
-    st.markdown('<p class="main-header">🎾 Single Match Viewer</p>', unsafe_allow_html=True)
+    st.markdown('<p class="main-header"> Single Match Viewer</p>', unsafe_allow_html=True)
     st.markdown('<p class="sub-header">Simulate and analyze a single match in detail</p>', unsafe_allow_html=True)
 
     # Load players
@@ -438,7 +438,7 @@ def render():
 
         # Match Result Header
         st.markdown("---")
-        st.markdown("## 🏆 Match Result")
+        st.markdown("## Match Result")
 
         # Winner announcement
         winner_emoji = "🥇"

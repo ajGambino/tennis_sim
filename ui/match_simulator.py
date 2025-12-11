@@ -177,7 +177,7 @@ def create_win_distribution_chart(results, player_a, player_b):
 def render():
     """Render the Match Simulator page"""
 
-    st.markdown('<p class="main-header">🎾 Match Simulator</p>', unsafe_allow_html=True)
+    st.markdown('<p class="main-header"> Match Simulator</p>', unsafe_allow_html=True)
     st.markdown('<p class="sub-header">Run multiple match simulations and analyze results</p>', unsafe_allow_html=True)
 
     # Load players

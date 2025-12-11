@@ -183,66 +183,16 @@ warning: Player X has only 5 matches on clay, using fallback stats
 | 5000 simulations        | ~15 seconds  |
 | 10000 simulations       | ~30 seconds  |
 
-## Shot-Level Simulation (Phase 3A)
+## What's Next?
 
-### Compare Point-Level vs Shot-Level
+**Phase 2** (in development):
 
-```bash
-# Compare both simulation modes
-python compare_shot_vs_point.py --playerA "Jannik Sinner" --playerB "Carlos Alcaraz" --n 100
-
-# On specific surface
-python compare_shot_vs_point.py --playerA "Rafael Nadal" --playerB "Novak Djokovic" --surface clay --n 500
-```
-
-### Train Shot Models (Optional)
-
-```bash
-# Download Match Charting Project data (one-time setup)
-download_charting_data.bat  # Windows
-./download_charting_data.sh  # Mac/Linux
-
-# Train serve placement model
-python training/train_serve_model.py --tour atp
-
-# Train rally model
-python training/train_rally_model.py --tour atp
-```
-
-### Validate Shot Simulation
-
-```bash
-# Validate serve placements
-python analysis/validate_shot_simulation.py --validate serve --player "Novak Djokovic"
-
-# Validate rally lengths
-python analysis/validate_shot_simulation.py --validate rally --num_sims 500
-
-# Run all validations
-python analysis/validate_shot_simulation.py --validate all
-```
-
-### Shot-Level Features
-
-- **Serve placement:** Wide / T / Body zones
-- **Return quality:** Winner / Deep / Short / Error
-- **Rally simulation:** Shot-by-shot exchanges
-- **Court positioning:** Baseline / Net / Inside baseline
-- **Tactical modeling:** Approach shots, shot selection
-- **Rally statistics:** Length, point-ending shots, shot types
-
-**See:** [QUICK_START_SHOT_LEVEL.md](QUICK_START_SHOT_LEVEL.md) and [PHASE_3A_SHOT_LEVEL.md](PHASE_3A_SHOT_LEVEL.md)
-
-## Phase Evolution
-
-- ✅ **Phase 0:** Basic point-level simulation
-- ✅ **Phase 1:** Elo rating system integration
-- ✅ **Phase 2:** ML-powered predictions with XGBoost
-- ✅ **Phase 3A:** Shot-by-shot simulation with Match Charting Project ← **YOU ARE HERE**
-- 🚧 **Phase 3B:** Advanced tactics, momentum, fatigue (coming soon)
+- XGBoost ML models for point prediction
+- Feature engineering from match history
+- Fatigue modeling
+- Point-by-point data integration
+- Further performance optimization
 
 ---
 
-**Quick start (point-level):** `python run_bulk.py --playerA "Jannik Sinner" --playerB "Carlos Alcaraz" --use_elo --n 5000`
-
-**Quick start (shot-level):** `python compare_shot_vs_point.py --playerA "Jannik Sinner" --playerB "Carlos Alcaraz" --n 100`
+**Quick start:** `python run_bulk.py --playerA "Jannik Sinner" --playerB "Carlos Alcaraz" --use_elo --n 5000`

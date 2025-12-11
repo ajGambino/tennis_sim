@@ -39,6 +39,7 @@ pip install -r requirements.txt
 ```
 
 Requirements:
+
 - Python 3.8+
 - pandas >= 2.0.0
 - numpy >= 1.24.0
@@ -74,6 +75,7 @@ python run_single.py --playerA "Novak Djokovic" --playerB "Carlos Alcaraz"
 ```
 
 Output includes:
+
 - Full match box score
 - Aces, double faults, first serve %, points won
 - Break points won/saved
@@ -102,6 +104,7 @@ python run_bulk.py --playerA "Novak Djokovic" --playerB "Carlos Alcaraz" --n 500
 ```
 
 Output includes:
+
 - Win probability for each player
 - Score distribution (most common final scores)
 - Sets won distribution
@@ -149,6 +152,7 @@ tennis/
 ### 1. Data Loading
 
 The `data_loader.py` module:
+
 - Loads CSV files from Jeff Sackmann's repositories
 - Supports both ATP and WTA data
 - Handles multiple years of data
@@ -160,6 +164,7 @@ The `data_loader.py` module:
 The `player_stats.py` module computes probabilistic parameters for each player:
 
 **Serve Statistics:**
+
 - First serve % = `1stIn / svpt`
 - Ace % = `ace / svpt`
 - Double fault % = `df / (svpt - 1stIn)`
@@ -167,10 +172,12 @@ The `player_stats.py` module computes probabilistic parameters for each player:
 - Second serve win % = `2ndWon / (svpt - 1stIn)`
 
 **Return Statistics:**
+
 - Return first serve win % = `1 - opponent_first_serve_win_%`
 - Return second serve win % = `1 - opponent_second_serve_win_%`
 
 Statistics can be aggregated:
+
 - By surface (hard, clay, grass, carpet)
 - Across all surfaces
 - With Laplace smoothing to blend actual stats with tour averages
@@ -196,15 +203,18 @@ The blending gives 60% weight to server stats and 40% to returner stats, reflect
 The `match_engine.py` module implements full tennis rules:
 
 **Game Logic:**
+
 - Standard advantage scoring (0, 15, 30, 40, deuce, advantage)
 - Tracks break points (when returner is one point from breaking)
 
 **Set Logic:**
+
 - First to 6 games, must win by 2
 - Tiebreak at 6-6 (first to 7 points, win by 2)
 - Server alternates every point in tiebreak (after first point)
 
 **Match Logic:**
+
 - Best of 3 or best of 5 sets
 - Comprehensive statistics tracking for both players
 - Random selection of who serves first
@@ -212,6 +222,7 @@ The `match_engine.py` module implements full tennis rules:
 ### 5. Bulk Simulation
 
 The `simulator.py` module:
+
 - Runs N independent match simulations
 - Uses sequential seeds for reproducibility
 - Aggregates results into pandas DataFrame
@@ -227,9 +238,10 @@ This framework uses data from Jeff Sackmann's tennis repositories:
 
 - **ATP Data**: https://github.com/JeffSackmann/tennis_atp
 - **WTA Data**: https://github.com/JeffSackmann/tennis_wta
-- **Point-by-point Data**: https://github.com/JeffSackmann/tennis_MatchChartingProject (optional)
+- **Point-by-point Data**: https://github.com/JeffSackmann/tennis_MatchChartingProject
 
 These datasets are updated regularly and contain:
+
 - Match-level statistics from 1991-present (tour-level)
 - Serve statistics, break points, aces, double faults, etc.
 - Tournament info, surface, date, player names
@@ -380,6 +392,7 @@ result = sim.simulate_match()
 ## Limitations and Future Enhancements
 
 **Current Limitations:**
+
 - Does not account for player fatigue over long matches
 - Does not model momentum or streakiness
 - Return stats derived from opponent serve stats (not direct return measurements)
@@ -387,6 +400,7 @@ result = sim.simulate_match()
 - No recent form weighting
 
 **Potential Enhancements:**
+
 - Incorporate point-by-point charting data for more granular modeling
 - Add player ranking/Elo adjustments
 - Model time-varying probabilities (fatigue, momentum)
