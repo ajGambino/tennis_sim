@@ -141,6 +141,9 @@ class RallyModel:
         """
         shots = []
 
+        # determine server's position after serve (baseline or approaching net)
+        server_position = self._get_position_after_serve(serve_placement)
+
         # shot 1: serve (not simulated here, but counted)
         serve_shot = Shot(
             shot_number=1,
@@ -148,7 +151,7 @@ class RallyModel:
             shot_type=ShotType.FOREHAND,  # serves are technically forehands
             direction=self._placement_to_direction(serve_placement),
             outcome=ShotOutcome.IN_PLAY,
-            position=CourtPosition.BASELINE,
+            position=server_position,  # use actual position (might be net if serve-volleying)
             is_approach=False
         )
         shots.append(serve_shot)
@@ -164,12 +167,19 @@ class RallyModel:
         server_aggression = self._get_player_aggression(server_name)
         returner_aggression = self._get_player_aggression(returner_name)
 
+        # adjust server position based on return quality
+        # if return was short, server moves inside baseline
+        if hasattr(return_shot, 'outcome') and return_shot.outcome == ShotOutcome.IN_PLAY:
+            # infer return quality from context - if we have access to return quality info
+            # for now, give server 25% chance to be inside baseline after a successful return
+            if server_position == CourtPosition.BASELINE and self.rng.random() < 0.25:
+                server_position = CourtPosition.INSIDE_BASELINE
+
         # continue rally shot by shot
         current_player = 'server'  # server hits shot 3
         shot_number = 3
 
-        # track positions
-        server_position = self._get_position_after_serve(serve_placement)
+        # track positions (server position already determined above)
         returner_position = CourtPosition.BASELINE
 
         # track previous shot quality
@@ -551,11 +561,16 @@ class RallyModel:
         if previous_shot_quality != 'offensive':
             return False
 
-        # more likely to approach on short rallies
-        if shot_number > 8:
-            approach_prob = 0.05
+        # increased approach probability, especially from inside baseline
+        if position == CourtPosition.INSIDE_BASELINE:
+            # already inside, more likely to finish approach
+            approach_prob = 0.35 if shot_number <= 5 else 0.25
+        elif shot_number > 8:
+            # long rallies, less likely to approach (tired)
+            approach_prob = 0.08
         else:
-            approach_prob = 0.15
+            # short rallies from baseline
+            approach_prob = 0.20
 
         return self.rng.random() < approach_prob
 
@@ -594,18 +609,36 @@ class RallyModel:
         if shot.shot_type == ShotType.DROP_SHOT:
             return CourtPosition.INSIDE_BASELINE
 
-        # move inside baseline on offensive shots (20% chance)
+        # move inside baseline on offensive shots (increased probability)
         if current_position == CourtPosition.BASELINE:
-            # check if shot is offensive (aggressive direction or winner)
-            if shot.outcome == ShotOutcome.WINNER or shot.direction == ShotDirection.DOWN_THE_LINE:
-                if self.rng.random() < 0.20:
-                    return CourtPosition.INSIDE_BASELINE
+            move_inside_prob = 0.0
 
-        # after being inside baseline, drift back to baseline (60%) or stay (40%)
+            # very aggressive shots: high probability
+            if shot.outcome == ShotOutcome.WINNER:
+                move_inside_prob = 0.50  # winners often hit from inside baseline
+            elif shot.direction == ShotDirection.DOWN_THE_LINE:
+                move_inside_prob = 0.40  # DTL shots are aggressive
+            elif shot.direction == ShotDirection.WIDE:
+                move_inside_prob = 0.30  # wide shots to attack opponent
+            elif shot.shot_type == ShotType.SLICE and shot.direction == ShotDirection.CROSS_COURT:
+                move_inside_prob = 0.25  # slice approach
+
+            if move_inside_prob > 0 and self.rng.random() < move_inside_prob:
+                return CourtPosition.INSIDE_BASELINE
+
+        # after being inside baseline, mostly stay inside (drift back less often)
         if current_position == CourtPosition.INSIDE_BASELINE:
+            # occasionally continue approach to mid-court (especially on slice/drop shots)
+            if shot.shot_type in [ShotType.SLICE, ShotType.DROP_SHOT]:
+                if self.rng.random() < 0.40:  # 40% move to mid-court on slice/drops
+                    return CourtPosition.MID_COURT
+
+            # regular groundstrokes: small chance to drift back
             if shot.shot_type in [ShotType.FOREHAND, ShotType.BACKHAND]:
-                if self.rng.random() < 0.60:
+                # only 35% chance to drift back (was 60%)
+                if self.rng.random() < 0.35:
                     return CourtPosition.BASELINE
+                # 65% stay inside baseline - more aggressive modern tennis
 
         # default: stay at current position
         return current_position
@@ -620,10 +653,15 @@ class RallyModel:
         returns:
             server's position
         """
-        # most servers stay at baseline in modern game
-        # occasionally approach net on wide serves
+        # modern game: most servers stay at baseline
+        # but some approach net, especially on wide/T serves
         if serve_placement == ServePlacement.WIDE:
-            if self.rng.random() < 0.10:  # 10% of time approach on wide serve
+            # wide serve: good serve-volley opportunity (15%)
+            if self.rng.random() < 0.15:
+                return CourtPosition.NET
+        elif serve_placement == ServePlacement.T:
+            # T serve: also good for serve-volley (12%)
+            if self.rng.random() < 0.12:
                 return CourtPosition.NET
 
         return CourtPosition.BASELINE
