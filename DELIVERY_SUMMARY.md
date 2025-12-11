@@ -28,6 +28,7 @@ tennis/
 ## ✅ Feature Checklist
 
 ### 1. Data Ingestion ✓
+
 - [x] Loads Jeff Sackmann's ATP/WTA match data from CSVs
 - [x] Parses columns: `w_ace`, `w_df`, `w_svpt`, `w_1stIn`, `w_1stWon`, `w_2ndWon`, etc.
 - [x] Clean preprocessing with surface standardization
@@ -35,6 +36,7 @@ tennis/
 - [x] Multi-year data aggregation
 
 ### 2. Player Projection Calibration ✓
+
 - [x] Computes per-player serve/return probabilities
 - [x] First serve %, ace %, double fault %, serve win %
 - [x] Surface-level aggregation (hard/clay/grass/carpet)
@@ -43,6 +45,7 @@ tennis/
 - [x] Hooks for custom user projections (via `PlayerStats` class)
 
 ### 3. Point-Level Match Simulation Engine ✓
+
 - [x] Object-oriented design: `PointSimulator`, `MatchSimulator`
 - [x] Ace probability → instant point
 - [x] Double fault probability → instant point
@@ -54,6 +57,7 @@ tennis/
 - [x] Best of 3 and best of 5 support
 
 ### 4. Output Full Match Statistics ✓
+
 - [x] Player A & B statistics dictionary
 - [x] Aces, double faults
 - [x] First serve %, first serve points won
@@ -66,6 +70,7 @@ tennis/
 - [x] Clean printable format
 
 ### 5. Bulk Simulation (1000+ matches) ✓
+
 - [x] `run_simulations(playerA, playerB, n=1000)` function
 - [x] Returns pandas DataFrame with one row per simulation
 - [x] Columns: winner, score, aces, DFs, sets, all stats
@@ -77,6 +82,7 @@ tennis/
 - [x] Progress tracking during simulation
 
 ### 6. Project Structure ✓
+
 - [x] Modular file organization
 - [x] Clean separation of concerns
 - [x] Fully working imports
@@ -85,18 +91,23 @@ tennis/
 ### 7. Execution Examples ✓
 
 **Single Match:**
+
 ```bash
 python run_single.py --playerA "Novak Djokovic" --playerB "Carlos Alcaraz"
 ```
+
 ✓ Tested and working - prints full box score
 
 **Bulk Monte Carlo:**
+
 ```bash
 python run_bulk.py --playerA "Novak Djokovic" --playerB "Carlos Alcaraz" --n 5000
 ```
+
 ✓ Tested and working - outputs summary + CSV to results/
 
 ### 8. Requirements ✓
+
 - [x] Python 3.x compatible
 - [x] pandas >= 2.0.0
 - [x] numpy >= 1.24.0
@@ -105,9 +116,10 @@ python run_bulk.py --playerA "Novak Djokovic" --playerB "Carlos Alcaraz" --n 500
 - [x] Includes synthetic fallback data
 
 ### 9. Code Quality ✓
+
 - [x] Fully functional Python code (no pseudocode)
 - [x] All modules working end-to-end
-- [x] Comprehensive inline comments (lowercase, no punctuation)
+- [x] Comprehensive inline comments
 - [x] Modular design with classes & functions
 - [x] Type hints throughout
 - [x] Error handling and fallbacks
@@ -115,30 +127,39 @@ python run_bulk.py --playerA "Novak Djokovic" --playerB "Carlos Alcaraz" --n 500
 ## 🧪 Testing Results
 
 ### Test 1: Single Match (Best of 3)
+
 ```bash
 python run_single.py --playerA "Novak Djokovic" --playerB "Carlos Alcaraz" --seed 42
 ```
+
 **Result:** ✅ SUCCESS
+
 - Winner: Novak Djokovic
 - Score: 6-4, 7-5
 - Full statistics printed correctly
 - Seed reproducibility confirmed
 
 ### Test 2: Single Match (Best of 5)
+
 ```bash
 python run_single.py --playerA "Novak Djokovic" --playerB "Carlos Alcaraz" --best_of 5 --seed 999
 ```
+
 **Result:** ✅ SUCCESS
+
 - Winner: Carlos Alcaraz
 - Score: 7-6, 4-6, 3-6, 6-2, 2-6
 - 5-set match logic working perfectly
 - Extended statistics accurate
 
 ### Test 3: Bulk Simulation (100 matches)
+
 ```bash
 python run_bulk.py --playerA "Novak Djokovic" --playerB "Carlos Alcaraz" --n 100 --seed 100
 ```
+
 **Result:** ✅ SUCCESS
+
 - 100 simulations completed
 - Win probability: Djokovic 55%, Alcaraz 45%
 - Score distributions computed
@@ -148,6 +169,7 @@ python run_bulk.py --playerA "Novak Djokovic" --playerB "Carlos Alcaraz" --n 100
 ## 📊 Sample Output
 
 ### Single Match Box Score
+
 ```
 ======================================================================
 Novak Djokovic vs Carlos Alcaraz
@@ -168,6 +190,7 @@ Total Points Won                            13               9
 ```
 
 ### Monte Carlo Summary
+
 ```
 ======================================================================
 MONTE CARLO SIMULATION RESULTS
@@ -193,6 +216,7 @@ First Serve % (mean)                    65.6%          64.7%
 ## 🎯 Accuracy & Fidelity
 
 ### Tennis Rules Implementation
+
 - ✅ Correct advantage scoring (0-15-30-40-deuce-ad)
 - ✅ Tiebreak at 6-6 (first to 7, win by 2)
 - ✅ Server alternation in tiebreak (every 2 points)
@@ -200,6 +224,7 @@ First Serve % (mean)                    65.6%          64.7%
 - ✅ Best of 3 and best of 5 match formats
 
 ### Statistical Model
+
 - ✅ Ace probability calculated from historical data
 - ✅ Double fault probability on second serves
 - ✅ First serve % determines first/second serve distribution
@@ -208,6 +233,7 @@ First Serve % (mean)                    65.6%          64.7%
 - ✅ All statistics match real tennis patterns
 
 ### Data Integration
+
 - ✅ Uses exact Sackmann column names (`w_ace`, `w_1stIn`, etc.)
 - ✅ Handles missing data gracefully
 - ✅ Surface-specific aggregation
@@ -230,11 +256,13 @@ First Serve % (mean)                    65.6%          64.7%
 The framework is **production-ready** and can be used immediately:
 
 1. **Install dependencies:**
+
    ```bash
    pip install -r requirements.txt
    ```
 
 2. **Run simulation:**
+
    ```bash
    python run_single.py --playerA "Novak Djokovic" --playerB "Carlos Alcaraz"
    ```

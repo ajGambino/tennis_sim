@@ -49,7 +49,7 @@ class RallyModel:
             player_name: player's name (for player-specific patterns)
 
         returns:
-            aggression multiplier (0.6-1.4, default 1.0)
+            aggression multiplier (0.5-1.5, default 1.0)
         """
         if player_name and player_name in self.rally_patterns:
             pattern = self.rally_patterns[player_name]
@@ -57,13 +57,13 @@ class RallyModel:
 
             if avg_length:
                 # baseline: 3.2 shots (typical avg rally length)
-                # federer (2.85) = aggressive → 1.07x multiplier
-                # nadal (3.59) = defensive → 0.92x multiplier
+                # federer (2.85) = aggressive → 1.12x multiplier
+                # nadal (3.59) = defensive → 0.86x multiplier
                 # range in data: 1.64 to 6.87 shots
                 baseline = 3.2
-                aggression = 1.0 + (baseline - avg_length) * 0.20
+                aggression = 1.0 + (baseline - avg_length) * 0.35
 
-                return np.clip(aggression, 0.6, 1.4)
+                return np.clip(aggression, 0.5, 1.5)
 
         return 1.0  # default neutral aggression
 
@@ -391,8 +391,8 @@ class RallyModel:
         player_skill = (player_stats.first_serve_win_pct + player_stats.return_first_win_pct) / 2
         opponent_skill = (opponent_stats.first_serve_win_pct + opponent_stats.return_first_win_pct) / 2
 
-        # base error rate around 8-12% per shot
-        base_error = 0.10
+        # base error rate around 12-16% per shot
+        base_error = 0.14
 
         # better players have lower error rates
         skill_adjustment = 1.0 - (player_skill - 0.50)  # assuming 0.50 is average
@@ -415,11 +415,11 @@ class RallyModel:
         # use serve win % and return win % as proxies for overall skill
         player_skill = (player_stats.first_serve_win_pct + player_stats.return_first_win_pct) / 2
 
-        # base winner rate around 3-7% per shot
-        base_winner = 0.05
+        # base winner rate around 8-12% per shot
+        base_winner = 0.10
 
         # better players hit more winners
-        skill_adjustment = 0.5 + (player_skill - 0.50) * 2.0
+        skill_adjustment = 1.0 + (player_skill - 0.50) * 1.0
 
         winner_rate = base_winner * skill_adjustment
 

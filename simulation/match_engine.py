@@ -86,6 +86,9 @@ class MatchStats:
     # random seed
     random_seed: int = 0
 
+    # point-by-point history (optional, for detailed analysis)
+    point_history: List['PointResult'] = field(default_factory=list)
+
     def to_dict(self) -> Dict:
         """convert to dictionary for easy export"""
         return {
@@ -123,7 +126,9 @@ class MatchSimulator:
 
     def __init__(self, player_a_stats: PlayerStats, player_b_stats: PlayerStats,
                  best_of: int = 3, seed: int = None,
-                 point_simulator: Optional[PointSimulator] = None):
+                 point_simulator: Optional[PointSimulator] = None,
+                 track_point_history: bool = False,
+                 surface: str = 'hard'):
         """
         initialize match simulator
 
@@ -134,11 +139,14 @@ class MatchSimulator:
             seed: random seed for reproducibility
             point_simulator: optional custom point simulator (for shot-level simulation)
                            if none, creates default point-level simulator
+            track_point_history: whether to store point-by-point details (default false)
+            surface: court surface for shot-level simulation (default 'hard')
         """
         self.player_a_stats = player_a_stats
         self.player_b_stats = player_b_stats
         self.best_of = best_of
         self.sets_to_win = (best_of + 1) // 2
+        self.surface = surface
 
         # initialize random generator
         if seed is None:
@@ -154,6 +162,7 @@ class MatchSimulator:
 
         # match tracking
         self.match_stats = None
+        self.track_point_history = track_point_history
 
     def simulate_match(self) -> MatchStats:
         """
@@ -287,7 +296,19 @@ class MatchSimulator:
 
         while True:
             # simulate point
-            point = self.point_sim.simulate_point(server_stats, returner_stats)
+            server_name = self.player_a_stats.player_name if server_is_a else self.player_b_stats.player_name
+            returner_name = self.player_b_stats.player_name if server_is_a else self.player_a_stats.player_name
+
+            point = self.point_sim.simulate_point(
+                server_stats, returner_stats,
+                server_name=server_name,
+                returner_name=returner_name,
+                surface=self.surface
+            )
+
+            # store point in history if tracking enabled
+            if self.track_point_history and self.match_stats:
+                self.match_stats.point_history.append(point)
 
             # update game score
             if point.server_won:
@@ -364,8 +385,19 @@ class MatchSimulator:
             # simulate point
             server_stats = self.player_a_stats if server_is_a else self.player_b_stats
             returner_stats = self.player_b_stats if server_is_a else self.player_a_stats
+            server_name = self.player_a_stats.player_name if server_is_a else self.player_b_stats.player_name
+            returner_name = self.player_b_stats.player_name if server_is_a else self.player_a_stats.player_name
 
-            point = self.point_sim.simulate_point(server_stats, returner_stats)
+            point = self.point_sim.simulate_point(
+                server_stats, returner_stats,
+                server_name=server_name,
+                returner_name=returner_name,
+                surface=self.surface
+            )
+
+            # store point in history if tracking enabled
+            if self.track_point_history and self.match_stats:
+                self.match_stats.point_history.append(point)
 
             # update score
             if point.server_won:

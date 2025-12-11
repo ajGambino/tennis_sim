@@ -9,3 +9,7 @@ optuna>=3.5.0
 # Visualization (optional)
 matplotlib>=3.8.0
 seaborn>=0.13.0
+
+# Web UI
+streamlit>=1.28.0
+plotly>=5.18.0
