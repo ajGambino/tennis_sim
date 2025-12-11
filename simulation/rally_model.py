@@ -184,11 +184,13 @@ class RallyModel:
                 player_stats = server_stats
                 opponent_stats = returner_stats
                 player_position = server_position
+                opponent_position = returner_position
                 player_aggression = server_aggression
             else:
                 player_stats = returner_stats
                 opponent_stats = server_stats
                 player_position = returner_position
+                opponent_position = server_position
                 player_aggression = returner_aggression
 
             # simulate next shot
@@ -200,7 +202,8 @@ class RallyModel:
                 player_position=player_position,
                 previous_shot_quality=previous_shot_quality,
                 surface=surface,
-                player_aggression=player_aggression
+                player_aggression=player_aggression,
+                opponent_position=opponent_position
             )
 
             shots.append(shot)
@@ -231,7 +234,8 @@ class RallyModel:
                              player_position: CourtPosition,
                              previous_shot_quality: str,
                              surface: str,
-                             player_aggression: float = 1.0) -> Shot:
+                             player_aggression: float = 1.0,
+                             opponent_position: CourtPosition = CourtPosition.BASELINE) -> Shot:
         """
         simulate a single rally shot
 
@@ -244,21 +248,56 @@ class RallyModel:
             previous_shot_quality: 'offensive', 'neutral', 'defensive'
             surface: court surface
             player_aggression: aggression multiplier from player's avg rally length
+            opponent_position: opponent's court position (for tactical shot selection)
 
         returns:
             shot object
         """
-        # determine shot type (forehand or backhand)
-        # assumption: 55% forehand, 45% backhand in neutral rallies
-        forehand_pct = 0.55
+        # determine shot type based on position and situation
         if player_position == CourtPosition.NET:
-            # at net, more likely to volley
-            if self.rng.random() < 0.70:
+            # at net: volley, smash, or groundstroke
+            rand = self.rng.random()
+            if rand < 0.65:
                 shot_type = ShotType.VOLLEY
+            elif rand < 0.75:  # 10% smash when at net
+                shot_type = ShotType.SMASH
             else:
                 shot_type = ShotType.FOREHAND if self.rng.random() < 0.5 else ShotType.BACKHAND
+        elif opponent_position == CourtPosition.NET:
+            # opponent at net: lob or passing shot
+            if self.rng.random() < 0.25:  # 25% lob when opponent at net
+                shot_type = ShotType.LOB
+            else:
+                # passing shot (forehand/backhand)
+                shot_type = ShotType.FOREHAND if self.rng.random() < 0.55 else ShotType.BACKHAND
+        elif player_position == CourtPosition.INSIDE_BASELINE:
+            # attacking position: more aggressive shot selection
+            rand = self.rng.random()
+            if rand < 0.05:  # 5% drop shot when attacking
+                shot_type = ShotType.DROP_SHOT
+            elif rand < 0.20:  # 15% slice (approach or change of pace)
+                shot_type = ShotType.SLICE
+            else:
+                shot_type = ShotType.FOREHAND if self.rng.random() < 0.60 else ShotType.BACKHAND
+        elif previous_shot_quality == 'defensive':
+            # defensive situation: more slice and safe shots
+            rand = self.rng.random()
+            if rand < 0.25:  # 25% slice when defensive
+                shot_type = ShotType.SLICE
+            elif rand < 0.30:  # 5% lob to reset
+                shot_type = ShotType.LOB
+            else:
+                shot_type = ShotType.FOREHAND if self.rng.random() < 0.50 else ShotType.BACKHAND
         else:
-            shot_type = ShotType.FOREHAND if self.rng.random() < forehand_pct else ShotType.BACKHAND
+            # neutral baseline rally
+            rand = self.rng.random()
+            if rand < 0.10:  # 10% slice (variety)
+                shot_type = ShotType.SLICE
+            elif rand < 0.12:  # 2% drop shot
+                shot_type = ShotType.DROP_SHOT
+            else:
+                # 55% forehand, 33% backhand
+                shot_type = ShotType.FOREHAND if self.rng.random() < 0.625 else ShotType.BACKHAND
 
         # determine direction
         direction = self._choose_shot_direction(previous_shot_quality, player_position)
@@ -531,8 +570,14 @@ class RallyModel:
         returns:
             new position
         """
+        # approaching net: move to mid-court then net
         if shot.is_approach:
-            return CourtPosition.NET
+            if current_position == CourtPosition.BASELINE:
+                return CourtPosition.MID_COURT
+            elif current_position == CourtPosition.INSIDE_BASELINE or current_position == CourtPosition.MID_COURT:
+                return CourtPosition.NET
+            else:
+                return CourtPosition.NET
 
         # if at net, stay at net unless forced back
         if current_position == CourtPosition.NET:
@@ -541,8 +586,29 @@ class RallyModel:
             else:
                 return current_position
 
-        # default: stay at baseline
-        return CourtPosition.BASELINE
+        # if in mid-court and not approaching, complete approach to net
+        if current_position == CourtPosition.MID_COURT:
+            return CourtPosition.NET
+
+        # drop shots bring player inside baseline
+        if shot.shot_type == ShotType.DROP_SHOT:
+            return CourtPosition.INSIDE_BASELINE
+
+        # move inside baseline on offensive shots (20% chance)
+        if current_position == CourtPosition.BASELINE:
+            # check if shot is offensive (aggressive direction or winner)
+            if shot.outcome == ShotOutcome.WINNER or shot.direction == ShotDirection.DOWN_THE_LINE:
+                if self.rng.random() < 0.20:
+                    return CourtPosition.INSIDE_BASELINE
+
+        # after being inside baseline, drift back to baseline (60%) or stay (40%)
+        if current_position == CourtPosition.INSIDE_BASELINE:
+            if shot.shot_type in [ShotType.FOREHAND, ShotType.BACKHAND]:
+                if self.rng.random() < 0.60:
+                    return CourtPosition.BASELINE
+
+        # default: stay at current position
+        return current_position
 
     def _get_position_after_serve(self, serve_placement: ServePlacement) -> CourtPosition:
         """

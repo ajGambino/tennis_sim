@@ -198,6 +198,7 @@ class ReturnModel:
 
     def create_return_shot(self, return_quality: ReturnQuality,
                           serve_placement: ServePlacement,
+                          is_second_serve: bool = False,
                           returner_forehand_pct: float = 0.55) -> Shot:
         """
         create a shot object for the return
@@ -205,26 +206,49 @@ class ReturnModel:
         args:
             return_quality: quality of return ('winner', 'deep', 'short', 'error')
             serve_placement: where serve was placed
+            is_second_serve: whether this is a second serve (affects shot selection)
             returner_forehand_pct: probability returner uses forehand
 
         returns:
             shot object representing the return
         """
-        # determine shot type (forehand or backhand)
-        # depends on serve placement and returner's handedness
-        # for simplicity, assume right-handed returner
-        if serve_placement == ServePlacement.WIDE:
-            # wide serve typically goes to backhand (ad court) or forehand (deuce court)
-            # assume 50/50
-            use_forehand = self.rng.random() < 0.5
-        elif serve_placement == ServePlacement.T:
-            # T serve can be hit with either wing
-            use_forehand = self.rng.random() < returner_forehand_pct
-        else:  # BODY
-            # body serves often lead to forehand returns
-            use_forehand = self.rng.random() < 0.65
+        # determine base shot type (forehand, backhand, or slice)
+        # depends on serve placement, quality, and whether it's a second serve
 
-        shot_type = ShotType.FOREHAND if use_forehand else ShotType.BACKHAND
+        # slice returns are more common when:
+        # - defending against wide/T serves on first serve
+        # - return quality is 'short' (defensive chip return)
+        use_slice = False
+        if return_quality == 'short' or return_quality == 'error':
+            # defensive situation, more likely to slice
+            if self.rng.random() < 0.20:  # 20% slice on defensive returns
+                use_slice = True
+        elif not is_second_serve and serve_placement in [ServePlacement.WIDE, ServePlacement.T]:
+            # first serve wide/T: slice to neutralize power (12%)
+            if self.rng.random() < 0.12:
+                use_slice = True
+        elif is_second_serve and serve_placement == ServePlacement.BODY:
+            # second serve to body: occasional slice (8%)
+            if self.rng.random() < 0.08:
+                use_slice = True
+
+        if use_slice:
+            shot_type = ShotType.SLICE
+        else:
+            # determine forehand or backhand based on serve placement
+            # for simplicity, assume right-handed returner
+            if serve_placement == ServePlacement.WIDE:
+                # wide serve typically goes to backhand (ad court) or forehand (deuce court)
+                # assume 50/50
+                use_forehand = self.rng.random() < 0.5
+            elif serve_placement == ServePlacement.T:
+                # T serve can be hit with either wing
+                use_forehand = self.rng.random() < returner_forehand_pct
+            else:  # BODY
+                # body serves often lead to forehand returns
+                use_forehand = self.rng.random() < 0.65
+
+            shot_type = ShotType.FOREHAND if use_forehand else ShotType.BACKHAND
 
         # determine direction
         # returns typically go cross-court (safer, higher margin)
@@ -290,7 +314,8 @@ class ReturnModel:
 
         return self.create_return_shot(
             return_quality=return_quality,
-            serve_placement=serve_placement
+            serve_placement=serve_placement,
+            is_second_serve=is_second_serve
         )
 
     def get_return_quality_distribution(self, returner_stats: PlayerStats,
