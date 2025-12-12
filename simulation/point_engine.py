@@ -26,6 +26,14 @@ class PointResult:
     serve_placement: Optional['ServePlacement'] = None  # where serve was placed
     point_ending_shot_type: Optional['ShotType'] = None  # type of shot that ended point
 
+    # score context (optional, only populated if track_point_history=true)
+    server_name: Optional[str] = None  # name of server for this point
+    returner_name: Optional[str] = None  # name of returner for this point
+    game_score: Optional[str] = None  # game score before this point (e.g., "30-15", "Deuce")
+    games_score: Optional[str] = None  # games score in current set (e.g., "3-2")
+    set_number: Optional[int] = None  # which set this point is in (1, 2, 3, ...)
+    sets_score: Optional[str] = None  # sets won by each player (e.g., "1-0")
+
 
 class PointSimulator:
     """simulates individual tennis points"""

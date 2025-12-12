@@ -196,7 +196,10 @@ class MatchSimulator:
             # alternate who serves first each set
             server_is_a = a_serves_first if len(set_scores) % 2 == 0 else not a_serves_first
 
-            set_result = self._simulate_set(server_is_a)
+            # current set number (1-based)
+            current_set = len(set_scores) + 1
+
+            set_result = self._simulate_set(server_is_a, sets_a, sets_b, current_set)
 
             # update set counts
             if set_result.player_a_games > set_result.player_b_games:
@@ -216,12 +219,16 @@ class MatchSimulator:
 
         return self.match_stats
 
-    def _simulate_set(self, a_serves_first: bool) -> SetResult:
+    def _simulate_set(self, a_serves_first: bool, sets_a: int = 0,
+                      sets_b: int = 0, set_number: int = 1) -> SetResult:
         """
         simulate a single set
 
         args:
             a_serves_first: true if player a serves first in this set
+            sets_a: current sets won by player a (for score tracking)
+            sets_b: current sets won by player b (for score tracking)
+            set_number: current set number (for score tracking)
 
         returns:
             setresult with games won by each player
@@ -236,7 +243,8 @@ class MatchSimulator:
             server_is_a = (game_num % 2 == 0) == a_serves_first
 
             # simulate game
-            game_result = self._simulate_game(server_is_a, games_a, games_b)
+            game_result = self._simulate_game(server_is_a, games_a, games_b,
+                                             sets_a, sets_b, set_number)
 
             # update game count
             if game_result.server_won:
@@ -260,7 +268,8 @@ class MatchSimulator:
 
             # tiebreak at 6-6
             if games_a == 6 and games_b == 6:
-                tiebreak_winner_is_a = self._simulate_tiebreak(a_serves_first, game_num)
+                tiebreak_winner_is_a = self._simulate_tiebreak(a_serves_first, game_num,
+                                                               sets_a, sets_b, set_number)
                 if tiebreak_winner_is_a:
                     games_a = 7
                 else:
@@ -268,7 +277,8 @@ class MatchSimulator:
                 return SetResult(games_a, games_b, was_tiebreak=True)
 
     def _simulate_game(self, server_is_a: bool, games_a: int,
-                      games_b: int) -> GameResult:
+                      games_b: int, sets_a: int = 0, sets_b: int = 0,
+                      set_number: int = 1) -> GameResult:
         """
         simulate a single game with advantage scoring
 
@@ -276,6 +286,9 @@ class MatchSimulator:
             server_is_a: true if player a is serving
             games_a: current games won by a (for break point tracking)
             games_b: current games won by b (for break point tracking)
+            sets_a: current sets won by a (for score tracking)
+            sets_b: current sets won by b (for score tracking)
+            set_number: current set number (for score tracking)
 
         returns:
             gameresult with winner and stats
@@ -306,8 +319,16 @@ class MatchSimulator:
                 surface=self.surface
             )
 
-            # store point in history if tracking enabled
+            # add score context if tracking enabled
             if self.track_point_history and self.match_stats:
+                # populate score context fields
+                point.server_name = server_name
+                point.returner_name = returner_name
+                point.game_score = self._format_game_score(server_points, returner_points)
+                point.games_score = f"{games_a}-{games_b}"
+                point.set_number = set_number
+                point.sets_score = f"{sets_a}-{sets_b}"
+
                 self.match_stats.point_history.append(point)
 
             # update game score
@@ -354,13 +375,17 @@ class MatchSimulator:
                 self._track_break_point(server_is_a, point.server_won)
 
     def _simulate_tiebreak(self, a_served_first_in_set: bool,
-                          game_num: int) -> bool:
+                          game_num: int, sets_a: int = 0, sets_b: int = 0,
+                          set_number: int = 1) -> bool:
         """
         simulate tiebreak (first to 7, win by 2)
 
         args:
             a_served_first_in_set: who served first in the set
             game_num: current game number (for server rotation)
+            sets_a: current sets won by a (for score tracking)
+            sets_b: current sets won by b (for score tracking)
+            set_number: current set number (for score tracking)
 
         returns:
             true if player a won tiebreak
@@ -395,8 +420,16 @@ class MatchSimulator:
                 surface=self.surface
             )
 
-            # store point in history if tracking enabled
+            # add score context if tracking enabled
             if self.track_point_history and self.match_stats:
+                # populate score context fields for tiebreak
+                point.server_name = server_name
+                point.returner_name = returner_name
+                point.game_score = f"TB {points_a}-{points_b}"  # tiebreak score
+                point.games_score = "6-6"  # always 6-6 in tiebreak
+                point.set_number = set_number
+                point.sets_score = f"{sets_a}-{sets_b}"
+
                 self.match_stats.point_history.append(point)
 
             # update score
@@ -480,6 +513,34 @@ class MatchSimulator:
     def _format_score(self, set_scores: List[Tuple[int, int]]) -> str:
         """format set scores as readable string"""
         return ', '.join(f"{a}-{b}" for a, b in set_scores)
+
+    def _format_game_score(self, server_points: int, returner_points: int) -> str:
+        """
+        format game score using tennis scoring system
+
+        args:
+            server_points: points won by server in current game
+            returner_points: points won by returner in current game
+
+        returns:
+            formatted score string (e.g., "30-15", "Deuce", "Ad In")
+        """
+        score_names = ['0', '15', '30', '40']
+
+        # both at 40 or higher = deuce/advantage
+        if server_points >= 3 and returner_points >= 3:
+            if server_points == returner_points:
+                return "Deuce"
+            elif server_points > returner_points:
+                return "Ad In"  # server advantage
+            else:
+                return "Ad Out"  # returner advantage
+
+        # normal scoring
+        server_score = score_names[min(server_points, 3)]
+        returner_score = score_names[min(returner_points, 3)]
+
+        return f"{server_score}-{returner_score}"
 
     def print_match_summary(self):
         """print formatted match summary"""

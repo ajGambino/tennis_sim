@@ -380,6 +380,19 @@ def display_play_by_play(match_result, player_a, player_b, use_shot_sim):
                 winner_emoji = "✅" if point.server_won else "🔄"
                 st.write(f"{winner_emoji} Winner: **{winner}**")
 
+            # Running score display
+            if hasattr(point, 'game_score') and point.game_score:
+                score_col1, score_col2 = st.columns([1, 1])
+
+                with score_col1:
+                    # Display game score and games score
+                    st.caption(f"📊 Score: **{point.game_score}** | Games: **{point.games_score}** (Set {point.set_number})")
+
+                with score_col2:
+                    # Display sets score if available
+                    if point.sets_score and point.sets_score != "0-0":
+                        st.caption(f"🏆 Sets: **{point.sets_score}**")
+
             # Point details
             if point.was_ace:
                 st.success(f"⚡ **ACE** - {server}")
@@ -394,8 +407,10 @@ def display_play_by_play(match_result, player_a, player_b, use_shot_sim):
 
                 with col2:
                     if point.serve_placement:
+                        # Get the enum value (W/T/B) not the full enum name
+                        placement_value = point.serve_placement.value if hasattr(point.serve_placement, 'value') else str(point.serve_placement)
                         placement_map = {'W': 'Wide', 'T': 'T (Center)', 'B': 'Body'}
-                        placement = placement_map.get(str(point.serve_placement).split('.')[-1], str(point.serve_placement))
+                        placement = placement_map.get(placement_value, placement_value)
                         st.write(f"📍 Serve Placement: **{placement}**")
 
                 # Shot-by-shot details
