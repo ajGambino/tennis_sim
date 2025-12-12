@@ -25,7 +25,7 @@ A comprehensive point-level and shot-by-shot Monte Carlo tennis simulation engin
 - **Phase 1:** Elo rating system integration for skill differentiation ([PHASE_1_COMPLETE.md](xReferences/PHASE_1_COMPLETE.md))
 - **Phase 2:** ML-powered parameter estimation with XGBoost ([PHASE_2_READY.md](xReferences/PHASE_2_READY.md))
 - **Phase 3A:** Shot-by-shot simulation with Match Charting Project integration ([PHASE_3A_COMPLETE.md](xReferences/PHASE_3A_COMPLETE.md))
-- **Phase 3B:** Interactive Streamlit UI with Elo-sorted players and advanced visualizations ← **YOU ARE HERE**
+- **Phase 3B:** Interactive Streamlit UI
 
 ## Installation
 
