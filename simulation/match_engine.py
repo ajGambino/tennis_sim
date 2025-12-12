@@ -319,9 +319,15 @@ class MatchSimulator:
                 surface=self.surface
             )
 
-            # add score context if tracking enabled
+            # update game score first
+            if point.server_won:
+                server_points += 1
+            else:
+                returner_points += 1
+
+            # add score context if tracking enabled (AFTER updating points)
             if self.track_point_history and self.match_stats:
-                # populate score context fields
+                # populate score context fields with score AFTER this point
                 point.server_name = server_name
                 point.returner_name = returner_name
                 point.game_score = self._format_game_score(server_points, returner_points)
@@ -330,12 +336,6 @@ class MatchSimulator:
                 point.sets_score = f"{sets_a}-{sets_b}"
 
                 self.match_stats.point_history.append(point)
-
-            # update game score
-            if point.server_won:
-                server_points += 1
-            else:
-                returner_points += 1
 
             # update stats
             if point.was_ace:
@@ -420,19 +420,7 @@ class MatchSimulator:
                 surface=self.surface
             )
 
-            # add score context if tracking enabled
-            if self.track_point_history and self.match_stats:
-                # populate score context fields for tiebreak
-                point.server_name = server_name
-                point.returner_name = returner_name
-                point.game_score = f"TB {points_a}-{points_b}"  # tiebreak score
-                point.games_score = "6-6"  # always 6-6 in tiebreak
-                point.set_number = set_number
-                point.sets_score = f"{sets_a}-{sets_b}"
-
-                self.match_stats.point_history.append(point)
-
-            # update score
+            # update score first
             if point.server_won:
                 if server_is_a:
                     points_a += 1
@@ -445,6 +433,18 @@ class MatchSimulator:
                     points_a += 1
 
             total_points += 1
+
+            # add score context if tracking enabled (AFTER updating points)
+            if self.track_point_history and self.match_stats:
+                # populate score context fields for tiebreak with score AFTER this point
+                point.server_name = server_name
+                point.returner_name = returner_name
+                point.game_score = f"TB {points_a}-{points_b}"  # tiebreak score after point
+                point.games_score = "6-6"  # always 6-6 in tiebreak
+                point.set_number = set_number
+                point.sets_score = f"{sets_a}-{sets_b}"
+
+                self.match_stats.point_history.append(point)
 
             # update match stats
             aces = 1 if point.was_ace else 0

@@ -299,9 +299,12 @@ def display_play_by_play(match_result, player_a, player_b, use_shot_sim):
     # Apply filters
     filtered_points = []
     for idx, point in enumerate(point_history):
-        # Determine server (alternates based on point index)
-        # Simplified: odd points = player A, even = player B (not perfectly accurate but close)
-        point_server = player_a if (idx % 2 == 0) else player_b
+        # Determine server from point data if available, otherwise estimate
+        if hasattr(point, 'server_name') and point.server_name:
+            point_server = point.server_name
+        else:
+            # Fallback: estimate based on point index (not accurate but better than nothing)
+            point_server = player_a if (idx % 2 == 0) else player_b
 
         # Filter by rally length
         if filter_rally_length != "All":
@@ -385,8 +388,8 @@ def display_play_by_play(match_result, player_a, player_b, use_shot_sim):
                 score_col1, score_col2 = st.columns([1, 1])
 
                 with score_col1:
-                    # Display game score and games score
-                    st.caption(f"📊 Score: **{point.game_score}** | Games: **{point.games_score}** (Set {point.set_number})")
+                    # Display game score and games score (after this point)
+                    st.caption(f"📊 Score after point: **{point.game_score}** | Games: **{point.games_score}** (Set {point.set_number})")
 
                 with score_col2:
                     # Display sets score if available
