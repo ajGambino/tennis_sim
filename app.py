@@ -18,7 +18,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 import streamlit as st
 
 # Import UI pages
-from ui import match_simulator, single_match_viewer, model_comparison
+from ui import match_simulator, single_match_viewer, model_comparison, player_stats
 
 # Page configuration
 st.set_page_config(
@@ -92,9 +92,7 @@ elif page == "Model Comparison":
     model_comparison.render()
 
 elif page == "Player Stats":
-    st.markdown('<p class="main-header">📈 Player Statistics</p>', unsafe_allow_html=True)
-    st.markdown('<p class="sub-header">Explore player patterns and statistics</p>', unsafe_allow_html=True)
-    st.info("🚧 Coming soon! This page will show detailed player stats.")
+    player_stats.render()
 
 # Footer
 st.markdown("---")
