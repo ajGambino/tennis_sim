@@ -18,7 +18,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 import streamlit as st
 
 # Import UI pages
-from ui import match_simulator, single_match_viewer, model_comparison, player_stats
+from ui import match_simulator, single_match_viewer, model_comparison, player_stats, tournament_simulator
 
 # Page configuration
 st.set_page_config(
@@ -58,7 +58,7 @@ with st.sidebar:
 
     page = st.radio(
         "Navigate",
-        ["Match Simulator", "Single Match Viewer", "Model Comparison", "Player Stats"],
+        ["Match Simulator", "Single Match Viewer", "Tournament Sims", "Model Comparison", "Player Stats"],
         label_visibility="collapsed"
     )
 
@@ -87,6 +87,9 @@ if page == "Match Simulator":
 
 elif page == "Single Match Viewer":
     single_match_viewer.render()
+
+elif page == "Tournament Sims":
+    tournament_simulator.render()
 
 elif page == "Model Comparison":
     model_comparison.render()

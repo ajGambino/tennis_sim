@@ -1,0 +1,716 @@
+{
+  "Gabriel Diallo": {
+    "elo": 1826.0,
+    "hard": 1750.5,
+    "clay": 1739.0,
+    "grass": 1718.2
+  },
+  "Alexander Shevchenko": {
+    "elo": 1675.0,
+    "hard": 1619.9,
+    "clay": 1641.9,
+    "grass": 1480.3
+  },
+  "Hady Habib": {
+    "elo": 1442.2,
+    "hard": 1402.2,
+    "clay": 1450.7,
+    "grass": 1446.3
+  },
+  "Ugo Humbert": {
+    "elo": 1880.6,
+    "hard": 1875.7,
+    "clay": 1738.1,
+    "grass": 1726.4
+  },
+  "Pavel Kotov": {
+    "elo": 1550.4,
+    "hard": 1515.5,
+    "clay": 1534.0,
+    "grass": 1479.2
+  },
+  "Taylor Fritz": {
+    "elo": 2028.6,
+    "hard": 1971.6,
+    "clay": 1896.8,
+    "grass": 1938.4
+  },
+  "Fabian Marozsan": {
+    "elo": 1798.6,
+    "hard": 1747.9,
+    "clay": 1739.3,
+    "grass": 1600.5
+  },
+  "Francisco Cerundolo": {
+    "elo": 1875.4,
+    "hard": 1832.3,
+    "clay": 1846.0,
+    "grass": 1659.9
+  },
+  "Thiago Seyboth Wild": {
+    "elo": 1529.0,
+    "hard": 1535.1,
+    "clay": 1507.1,
+    "grass": 1476.6
+  },
+  "Daniel Altmaier": {
+    "elo": 1762.1,
+    "hard": 1701.5,
+    "clay": 1727.2,
+    "grass": 1573.7
+  },
+  "Novak Djokovic": {
+    "elo": 2089.9,
+    "hard": 2041.6,
+    "clay": 1997.4,
+    "grass": 1950.2
+  },
+  "Stefanos Tsitsipas": {
+    "elo": 1866.7,
+    "hard": 1818.2,
+    "clay": 1904.8,
+    "grass": 1707.4
+  },
+  "David Goffin": {
+    "elo": 1730.7,
+    "hard": 1683.7,
+    "clay": 1696.1,
+    "grass": 1682.1
+  },
+  "Nikoloz Basilashvili": {
+    "elo": 1688.7,
+    "hard": 1650.4,
+    "clay": 1618.3,
+    "grass": 1632.0
+  },
+  "Arthur Rinderknech": {
+    "elo": 1828.2,
+    "hard": 1777.6,
+    "clay": 1734.3,
+    "grass": 1694.4
+  },
+  "Alex de Minaur": {
+    "elo": 2003.0,
+    "hard": 1952.4,
+    "clay": 1898.7,
+    "grass": 1837.4
+  },
+  "Jo\u00e3o Fonseca": {
+    "elo": 1931.9,
+    "hard": 1910.2,
+    "clay": 1810.3,
+    "grass": 1707.2
+  },
+  "James McCabe": {
+    "elo": 1496.7,
+    "hard": 1461.2,
+    "clay": 1311.8,
+    "grass": 1497.4
+  },
+  "Corentin Moutet": {
+    "elo": 1844.1,
+    "hard": 1775.7,
+    "clay": 1765.0,
+    "grass": 1738.3
+  },
+  "Jannik Sinner": {
+    "elo": 2293.2,
+    "hard": 2245.2,
+    "clay": 2153.9,
+    "grass": 2075.0
+  },
+  "Jiri Lehecka": {
+    "elo": 1921.3,
+    "hard": 1869.4,
+    "clay": 1797.5,
+    "grass": 1793.1
+  },
+  "Frances Tiafoe": {
+    "elo": 1817.9,
+    "hard": 1774.5,
+    "clay": 1774.0,
+    "grass": 1709.8
+  },
+  "Kasidit Samrej": {
+    "elo": 1243.6,
+    "hard": 1220.9,
+    "clay": 1336.0,
+    "grass": 1371.8
+  },
+  "Zhizhen Zhang": {
+    "elo": 1699.2,
+    "hard": 1625.3,
+    "clay": 1714.4,
+    "grass": 1600.6
+  },
+  "Hugo Gaston": {
+    "elo": 1698.0,
+    "hard": 1676.9,
+    "clay": 1636.1,
+    "grass": 1573.2
+  },
+  "Jordan Thompson": {
+    "elo": 1781.9,
+    "hard": 1742.8,
+    "clay": 1609.3,
+    "grass": 1713.4
+  },
+  "Felix Auger-Aliassime": {
+    "elo": 1990.8,
+    "hard": 1958.7,
+    "clay": 1866.4,
+    "grass": 1796.7
+  },
+  "Thiago Monteiro": {
+    "elo": 1550.8,
+    "hard": 1524.2,
+    "clay": 1539.5,
+    "grass": 1462.2
+  },
+  "Roberto Carballes Baena": {
+    "elo": 1673.4,
+    "hard": 1623.7,
+    "clay": 1653.8,
+    "grass": 1526.5
+  },
+  "Sebastian Korda": {
+    "elo": 1876.9,
+    "hard": 1832.6,
+    "clay": 1761.5,
+    "grass": 1770.6
+  },
+  "Borna Coric": {
+    "elo": 1740.9,
+    "hard": 1686.4,
+    "clay": 1726.3,
+    "grass": 1633.5
+  },
+  "Tristan Schoolkate": {
+    "elo": 1575.8,
+    "hard": 1531.9,
+    "clay": 1350.9,
+    "grass": 1573.7
+  },
+  "Nuno Borges": {
+    "elo": 1771.5,
+    "hard": 1744.6,
+    "clay": 1716.3,
+    "grass": 1620.1
+  },
+  "Jenson Brooksby": {
+    "elo": 1817.6,
+    "hard": 1762.2,
+    "clay": 1735.0,
+    "grass": 1716.2
+  },
+  "Mariano Navone": {
+    "elo": 1713.1,
+    "hard": 1565.0,
+    "clay": 1726.5,
+    "grass": 1521.3
+  },
+  "Matteo Arnaldi": {
+    "elo": 1764.8,
+    "hard": 1718.1,
+    "clay": 1760.0,
+    "grass": 1583.7
+  },
+  "Lorenzo Musetti": {
+    "elo": 1967.8,
+    "hard": 1885.1,
+    "clay": 1978.3,
+    "grass": 1849.9
+  },
+  "Andrey Rublev": {
+    "elo": 1875.2,
+    "hard": 1831.3,
+    "clay": 1845.8,
+    "grass": 1787.1
+  },
+  "Martin Landaluce": {
+    "elo": 1674.7,
+    "hard": 1649.5,
+    "clay": 1545.7,
+    "grass": 1635.7
+  },
+  "Luca Nardi": {
+    "elo": 1641.4,
+    "hard": 1609.1,
+    "clay": 1592.9,
+    "grass": 1456.8
+  },
+  "Taro Daniel": {
+    "elo": 1503.7,
+    "hard": 1484.7,
+    "clay": 1467.9,
+    "grass": 1449.5
+  },
+  "Arthur Fils": {
+    "elo": 1872.6,
+    "hard": 1795.5,
+    "clay": 1842.4,
+    "grass": 1722.4
+  },
+  "Cameron Norrie": {
+    "elo": 1855.9,
+    "hard": 1794.4,
+    "clay": 1828.7,
+    "grass": 1748.7
+  },
+  "Yannick Hanfmann": {
+    "elo": 1771.6,
+    "hard": 1716.6,
+    "clay": 1723.6,
+    "grass": 1638.0
+  },
+  "Botic van de Zandschulp": {
+    "elo": 1733.8,
+    "hard": 1700.8,
+    "clay": 1682.6,
+    "grass": 1587.8
+  },
+  "Tomas Machac": {
+    "elo": 1817.7,
+    "hard": 1797.0,
+    "clay": 1718.8,
+    "grass": 1681.7
+  },
+  "Giovanni Mpetshi Perricard": {
+    "elo": 1762.4,
+    "hard": 1714.1,
+    "clay": 1686.7,
+    "grass": 1663.5
+  },
+  "Arthur Cazaux": {
+    "elo": 1795.3,
+    "hard": 1737.2,
+    "clay": 1704.0,
+    "grass": 1659.9
+  },
+  "Grigor Dimitrov": {
+    "elo": 1859.4,
+    "hard": 1821.7,
+    "clay": 1757.5,
+    "grass": 1703.9
+  },
+  "Dominic Stricker": {
+    "elo": 1535.6,
+    "hard": 1500.0,
+    "clay": 1493.6,
+    "grass": 1531.3
+  },
+  "Jacob Fearnley": {
+    "elo": 1745.8,
+    "hard": 1698.5,
+    "clay": 1712.4,
+    "grass": 1641.9
+  },
+  "Carlos Alcaraz": {
+    "elo": 2272.8,
+    "hard": 2188.9,
+    "clay": 2216.6,
+    "grass": 2139.7
+  },
+  "Flavio Cobolli": {
+    "elo": 1859.9,
+    "hard": 1786.5,
+    "clay": 1821.7,
+    "grass": 1742.2
+  },
+  "Alejandro Davidovich Fokina": {
+    "elo": 1919.9,
+    "hard": 1873.1,
+    "clay": 1829.2,
+    "grass": 1737.7
+  },
+  "Gauthier Onclin": {
+    "elo": 1466.7,
+    "hard": 1414.8,
+    "clay": 1472.7,
+    "grass": 1435.0
+  },
+  "Nishesh Basavareddy": {
+    "elo": 1661.6,
+    "hard": 1646.0,
+    "clay": 1463.3,
+    "grass": 1514.2
+  },
+  "Brandon Nakashima": {
+    "elo": 1811.9,
+    "hard": 1763.3,
+    "clay": 1719.5,
+    "grass": 1728.3
+  },
+  "Mitchell Krueger": {
+    "elo": 1532.6,
+    "hard": 1492.7,
+    "clay": 1493.9,
+    "grass": 1459.5
+  },
+  "Tristan Boyer": {
+    "elo": 1492.0,
+    "hard": 1494.6,
+    "clay": 1459.6,
+    "grass": 1418.4
+  },
+  "Roman Safiullin": {
+    "elo": 1731.1,
+    "hard": 1718.1,
+    "clay": 1669.1,
+    "grass": 1600.8
+  },
+  "Camilo Ugo Carabelli": {
+    "elo": 1704.5,
+    "hard": 1603.6,
+    "clay": 1714.4,
+    "grass": 1468.9
+  },
+  "Adam Walton": {
+    "elo": 1622.1,
+    "hard": 1590.5,
+    "clay": 1463.2,
+    "grass": 1480.5
+  },
+  "Luciano Darderi": {
+    "elo": 1760.9,
+    "hard": 1592.9,
+    "clay": 1795.9,
+    "grass": 1581.6
+  },
+  "Daniil Medvedev": {
+    "elo": 1968.5,
+    "hard": 1934.5,
+    "clay": 1899.0,
+    "grass": 1863.3
+  },
+  "Benjamin Bonzi": {
+    "elo": 1763.9,
+    "hard": 1731.6,
+    "clay": 1619.7,
+    "grass": 1651.1
+  },
+  "Lorenzo Sonego": {
+    "elo": 1784.5,
+    "hard": 1740.9,
+    "clay": 1694.3,
+    "grass": 1683.2
+  },
+  "Aziz Dougaz": {
+    "elo": 1438.8,
+    "hard": 1412.7,
+    "clay": 1425.7,
+    "grass": 1390.3
+  },
+  "Alexander Zverev": {
+    "elo": 2048.0,
+    "hard": 2005.7,
+    "clay": 1996.7,
+    "grass": 1878.9
+  },
+  "James Duckworth": {
+    "elo": 1643.1,
+    "hard": 1608.5,
+    "clay": 1534.3,
+    "grass": 1568.5
+  },
+  "Sebastian Baez": {
+    "elo": 1654.4,
+    "hard": 1563.5,
+    "clay": 1665.6,
+    "grass": 1493.7
+  },
+  "Lukas Klein": {
+    "elo": 1588.7,
+    "hard": 1512.2,
+    "clay": 1617.7,
+    "grass": 1551.0
+  },
+  "Hubert Hurkacz": {
+    "elo": 1820.8,
+    "hard": 1752.9,
+    "clay": 1756.1,
+    "grass": 1727.3
+  },
+  "Nicol\u00e1s Jarry": {
+    "elo": 1706.7,
+    "hard": 1637.0,
+    "clay": 1679.4,
+    "grass": 1664.4
+  },
+  "Matteo Berrettini": {
+    "elo": 1852.4,
+    "hard": 1801.5,
+    "clay": 1830.7,
+    "grass": 1749.5
+  },
+  "Pablo Carreno Busta": {
+    "elo": 1736.0,
+    "hard": 1717.2,
+    "clay": 1702.7,
+    "grass": 1565.7
+  },
+  "Tallon Griekspoor": {
+    "elo": 1843.8,
+    "hard": 1785.4,
+    "clay": 1783.6,
+    "grass": 1779.0
+  },
+  "Cristian Gar\u00edn": {
+    "elo": 1734.2,
+    "hard": 1641.1,
+    "clay": 1728.4,
+    "grass": 1650.9
+  },
+  "Jakub Mensik": {
+    "elo": 1864.1,
+    "hard": 1839.1,
+    "clay": 1762.5,
+    "grass": 1693.4
+  },
+  "Denis Shapovalov": {
+    "elo": 1823.5,
+    "hard": 1807.7,
+    "clay": 1727.0,
+    "grass": 1657.2
+  },
+  "Adrian Mannarino": {
+    "elo": 1718.8,
+    "hard": 1681.9,
+    "clay": 1529.6,
+    "grass": 1683.3
+  },
+  "Jaume Munar": {
+    "elo": 1816.1,
+    "hard": 1767.0,
+    "clay": 1736.1,
+    "grass": 1642.9
+  },
+  "Zizou Bergs": {
+    "elo": 1802.4,
+    "hard": 1767.6,
+    "clay": 1691.9,
+    "grass": 1664.6
+  },
+  "Yoshihito Nishioka": {
+    "elo": 1734.8,
+    "hard": 1709.3,
+    "clay": 1641.3,
+    "grass": 1562.9
+  },
+  "Kamil Majchrzak": {
+    "elo": 1780.7,
+    "hard": 1738.9,
+    "clay": 1725.6,
+    "grass": 1676.0
+  },
+  "Roberto Bautista Agut": {
+    "elo": 1790.9,
+    "hard": 1724.8,
+    "clay": 1730.8,
+    "grass": 1729.5
+  },
+  "Miomir Kecmanovic": {
+    "elo": 1746.4,
+    "hard": 1699.4,
+    "clay": 1694.3,
+    "grass": 1634.9
+  },
+  "Jan-Lennard Struff": {
+    "elo": 1758.0,
+    "hard": 1695.8,
+    "clay": 1715.4,
+    "grass": 1652.3
+  },
+  "Tomas Martin Etcheverry": {
+    "elo": 1779.7,
+    "hard": 1743.6,
+    "clay": 1720.6,
+    "grass": 1569.2
+  },
+  "Alejandro Tabilo": {
+    "elo": 1781.6,
+    "hard": 1730.4,
+    "clay": 1730.3,
+    "grass": 1689.2
+  },
+  "Matteo Gigante": {
+    "elo": 1591.8,
+    "hard": 1533.6,
+    "clay": 1598.0,
+    "grass": 1457.1
+  },
+  "Li Tu": {
+    "elo": 1511.5,
+    "hard": 1461.6,
+    "clay": 1428.1,
+    "grass": 1528.2
+  },
+  "Juncheng Shang": {
+    "elo": 1733.9,
+    "hard": 1687.7,
+    "clay": 1634.2,
+    "grass": 1644.8
+  },
+  "Kei Nishikori": {
+    "elo": 1759.2,
+    "hard": 1719.9,
+    "clay": 1643.6,
+    "grass": 1613.8
+  },
+  "Federico Coria": {
+    "elo": 1580.0,
+    "hard": 1470.7,
+    "clay": 1558.5,
+    "grass": 1391.7
+  },
+  "Karen Khachanov": {
+    "elo": 1893.9,
+    "hard": 1835.9,
+    "clay": 1842.9,
+    "grass": 1775.1
+  },
+  "Aleksandar Vukic": {
+    "elo": 1691.9,
+    "hard": 1651.5,
+    "clay": 1574.5,
+    "grass": 1603.8
+  },
+  "Learner Tien": {
+    "elo": 1943.0,
+    "hard": 1907.6,
+    "clay": 1623.8,
+    "grass": 1713.8
+  },
+  "Gael Monfils": {
+    "elo": 1848.2,
+    "hard": 1823.1,
+    "clay": 1713.0,
+    "grass": 1674.2
+  },
+  "Dominik Koepfer": {
+    "elo": 1719.9,
+    "hard": 1669.9,
+    "clay": 1712.3,
+    "grass": 1613.0
+  },
+  "Holger Rune": {
+    "elo": 1801.9,
+    "hard": 1769.5,
+    "clay": 1773.7,
+    "grass": 1658.4
+  },
+  "Fabio Fognini": {
+    "elo": 1622.9,
+    "hard": 1568.7,
+    "clay": 1620.0,
+    "grass": 1554.3
+  },
+  "Jaime Faria": {
+    "elo": 1488.2,
+    "hard": 1445.3,
+    "clay": 1467.7,
+    "grass": 1506.0
+  },
+  "Dusan Lajovic": {
+    "elo": 1641.5,
+    "hard": 1555.7,
+    "clay": 1641.3,
+    "grass": 1498.3
+  },
+  "Omar Jasika": {
+    "elo": 1329.0,
+    "hard": 1309.0,
+    "clay": 1261.5,
+    "grass": 1259.1
+  },
+  "Jack Draper": {
+    "elo": 1932.4,
+    "hard": 1890.1,
+    "clay": 1816.6,
+    "grass": 1753.5
+  },
+  "Alexander Bublik": {
+    "elo": 1947.8,
+    "hard": 1852.6,
+    "clay": 1897.9,
+    "grass": 1842.9
+  },
+  "Pedro Martinez": {
+    "elo": 1603.7,
+    "hard": 1546.3,
+    "clay": 1601.5,
+    "grass": 1463.3
+  },
+  "Marcos Giron": {
+    "elo": 1762.0,
+    "hard": 1714.0,
+    "clay": 1652.7,
+    "grass": 1697.9
+  },
+  "Damir Dzumhur": {
+    "elo": 1693.5,
+    "hard": 1639.1,
+    "clay": 1679.5,
+    "grass": 1560.1
+  },
+  "Casper Ruud": {
+    "elo": 1951.1,
+    "hard": 1882.7,
+    "clay": 1947.6,
+    "grass": 1698.8
+  },
+  "Stan Wawrinka": {
+    "elo": 1708.3,
+    "hard": 1683.8,
+    "clay": 1649.0,
+    "grass": 1605.0
+  },
+  "Tommy Paul": {
+    "elo": 1851.8,
+    "hard": 1784.0,
+    "clay": 1803.9,
+    "grass": 1718.3
+  },
+  "Facundo Diaz Acosta": {
+    "elo": 1576.4,
+    "hard": 1502.7,
+    "clay": 1569.6,
+    "grass": 1424.2
+  },
+  "Ben Shelton": {
+    "elo": 1947.5,
+    "hard": 1899.3,
+    "clay": 1840.0,
+    "grass": 1789.3
+  },
+  "Alex Michelsen": {
+    "elo": 1762.4,
+    "hard": 1716.0,
+    "clay": 1631.0,
+    "grass": 1678.8
+  },
+  "Alexei Popyrin": {
+    "elo": 1799.9,
+    "hard": 1747.6,
+    "clay": 1774.0,
+    "grass": 1644.1
+  },
+  "Reilly Opelka": {
+    "elo": 1768.5,
+    "hard": 1732.4,
+    "clay": 1691.3,
+    "grass": 1644.3
+  },
+  "Quentin Halys": {
+    "elo": 1645.9,
+    "hard": 1604.4,
+    "clay": 1629.6,
+    "grass": 1604.4
+  },
+  "Rinky Hijikata": {
+    "elo": 1633.3,
+    "hard": 1598.7,
+    "clay": 1474.2,
+    "grass": 1577.0
+  }
+}
