@@ -325,6 +325,29 @@ def get_match_html(player_a, player_b, winner, score, round_name, match_id, win_
 def display_bracket_horizontal(results, r1_matchups):
     """Display tournament bracket in horizontal scrollable format with clickable buttons"""
 
+    # Add custom CSS for horizontal scrolling on mobile
+    st.markdown("""
+    <style>
+    .bracket-scroll-container {
+        overflow-x: auto;
+        overflow-y: hidden;
+        white-space: nowrap;
+        padding: 10px 0;
+        -webkit-overflow-scrolling: touch;
+    }
+    .bracket-round-col {
+        display: inline-block;
+        vertical-align: top;
+        white-space: normal;
+        width: 220px;
+        margin-right: 20px;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+    # Create horizontal scroll container
+    st.markdown('<div class="bracket-scroll-container">', unsafe_allow_html=True)
+
     # Create columns for each round
     rounds_data = [
         ('R1', 'Round 1', results.get('R1', {})),
@@ -339,58 +362,60 @@ def display_bracket_horizontal(results, r1_matchups):
     # Filter out empty rounds
     rounds_data = [(rk, rn, rd) for rk, rn, rd in rounds_data if rd]
 
-    # Create columns
-    cols = st.columns(len(rounds_data))
+    # Create each round as an inline-block div
+    for round_key, round_name, round_results in rounds_data:
+        st.markdown(f'<div class="bracket-round-col">', unsafe_allow_html=True)
+        st.markdown(f"**{round_name}**")
 
-    for idx, (round_key, round_name, round_results) in enumerate(rounds_data):
-        with cols[idx]:
-            st.markdown(f"**{round_name}**")
+        for match_id in sorted(round_results.keys()):
+            match_result = round_results[match_id]
 
-            for match_id in sorted(round_results.keys()):
-                match_result = round_results[match_id]
+            # Get player names
+            if round_key == 'R1':
+                player_a, player_b = r1_matchups[match_id]
+            else:
+                player_a = match_result.player_a_name
+                player_b = match_result.player_b_name
 
-                # Get player names
-                if round_key == 'R1':
-                    player_a, player_b = r1_matchups[match_id]
+            # Get win probabilities
+            win_prob_a = getattr(match_result, 'win_prob_a', None)
+            win_prob_b = getattr(match_result, 'win_prob_b', None)
+
+            # Truncate names
+            def truncate(name, max_len=15):
+                return name[:max_len-2] + ".." if len(name) > max_len else name
+
+            # Determine favorite/underdog and add color indicators
+            if win_prob_a and win_prob_b:
+                if win_prob_a > 0.5:
+                    # Player A is favorite (green), Player B is underdog (red)
+                    prob_a = f" 🟢 {win_prob_a:.0%}"
+                    prob_b = f" 🔴 {win_prob_b:.0%}"
                 else:
-                    player_a = match_result.player_a_name
-                    player_b = match_result.player_b_name
+                    # Player B is favorite (green), Player A is underdog (red)
+                    prob_a = f" 🔴 {win_prob_a:.0%}"
+                    prob_b = f" 🟢 {win_prob_b:.0%}"
+            else:
+                prob_a = f" ({win_prob_a:.0%})" if win_prob_a else ""
+                prob_b = f" ({win_prob_b:.0%})" if win_prob_b else ""
 
-                # Get win probabilities
-                win_prob_a = getattr(match_result, 'win_prob_a', None)
-                win_prob_b = getattr(match_result, 'win_prob_b', None)
+            # Create match display text
+            winner = match_result.winner
+            if winner == player_a:
+                match_text = f"**{truncate(player_a)}{prob_a}** ✓\n\n{truncate(player_b)}{prob_b}"
+            else:
+                match_text = f"{truncate(player_a)}{prob_a}\n\n**{truncate(player_b)}{prob_b}** ✓"
 
-                # Truncate names
-                def truncate(name, max_len=15):
-                    return name[:max_len-2] + ".." if len(name) > max_len else name
+            # Create button
+            if st.button(match_text, key=f"match_{round_key}_{match_id}", width='stretch'):
+                st.session_state.selected_match = (round_key, match_id)
+                st.rerun()
 
-                # Determine favorite/underdog and add color indicators
-                if win_prob_a and win_prob_b:
-                    if win_prob_a > 0.5:
-                        # Player A is favorite (green), Player B is underdog (red)
-                        prob_a = f" 🟢 {win_prob_a:.0%}"
-                        prob_b = f" 🔴 {win_prob_b:.0%}"
-                    else:
-                        # Player B is favorite (green), Player A is underdog (red)
-                        prob_a = f" 🔴 {win_prob_a:.0%}"
-                        prob_b = f" 🟢 {win_prob_b:.0%}"
-                else:
-                    prob_a = f" ({win_prob_a:.0%})" if win_prob_a else ""
-                    prob_b = f" ({win_prob_b:.0%})" if win_prob_b else ""
+            st.markdown("")  # Small gap between matches
 
-                # Create match display text
-                winner = match_result.winner
-                if winner == player_a:
-                    match_text = f"**{truncate(player_a)}{prob_a}** ✓\n\n{truncate(player_b)}{prob_b}"
-                else:
-                    match_text = f"{truncate(player_a)}{prob_a}\n\n**{truncate(player_b)}{prob_b}** ✓"
+        st.markdown('</div>', unsafe_allow_html=True)
 
-                # Create button
-                if st.button(match_text, key=f"match_{round_key}_{match_id}", width='stretch'):
-                    st.session_state.selected_match = (round_key, match_id)
-                    st.rerun()
-
-                st.markdown("")  # Small gap between matches
+    st.markdown('</div>', unsafe_allow_html=True)
 
 
 def display_match_stats(match_result, player_a, player_b):
